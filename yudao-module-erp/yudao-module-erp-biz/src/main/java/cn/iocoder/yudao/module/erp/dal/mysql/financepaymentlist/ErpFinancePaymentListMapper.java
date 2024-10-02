@@ -28,7 +28,7 @@ public interface ErpFinancePaymentListMapper extends BaseMapperX<ErpFinancePayme
                 .eqIfPresent(ErpFinancePaymentListDO::getRemark, reqVO.getRemark())
                 .eqIfPresent(ErpFinancePaymentListDO::getCreator, reqVO.getCreator())
                 .betweenIfPresent(ErpFinancePaymentListDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(ErpFinancePaymentListDO::getId));
+                .orderByDesc(ErpFinancePaymentListDO::getPaymentTime));
     }
 
 }
