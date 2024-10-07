@@ -10,6 +10,8 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentItemD
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +23,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
+import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -90,7 +94,9 @@ public class ErpFinancePaymentListController {
     @PreAuthorize("@ss.hasPermission('erp:finance-payment-list:query')")
     public CommonResult<PageResult<ErpFinancePaymentListRespVO>> getFinancePaymentListPage(@Valid ErpFinancePaymentListPageReqVO pageReqVO) {
         PageResult<ErpFinancePaymentListDO> pageResult = financePaymentListService.getFinancePaymentListPage(pageReqVO);
-        return success(buildFinancePaymentListVOPageResult(pageResult));
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        PageResult<ErpFinancePaymentListDO> allData = financePaymentListService.getFinancePaymentListPage(pageReqVO);
+        return success(buildFinancePaymentListVOPageResult(pageResult, allData));
     }
 
     @GetMapping("/export-excel")
@@ -100,13 +106,13 @@ public class ErpFinancePaymentListController {
     public void exportFinancePaymentListExcel(@Valid ErpFinancePaymentListPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpFinancePaymentListRespVO> list = buildFinancePaymentListVOPageResult(financePaymentListService.getFinancePaymentListPage(pageReqVO)).getList();
+        List<ErpFinancePaymentListRespVO> list = buildFinancePaymentListVOPageResult(financePaymentListService.getFinancePaymentListPage(pageReqVO),null).getList();
         // 导出 Excel
         ExcelUtils.write(response, "ERP 付款清单.xls", "数据", ErpFinancePaymentListRespVO.class,list);
 
     }
 
-    private PageResult<ErpFinancePaymentListRespVO> buildFinancePaymentListVOPageResult(PageResult<ErpFinancePaymentListDO> pageResult) {
+    private PageResult<ErpFinancePaymentListRespVO> buildFinancePaymentListVOPageResult(PageResult<ErpFinancePaymentListDO> pageResult, PageResult<ErpFinancePaymentListDO> allData) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
@@ -114,9 +120,29 @@ public class ErpFinancePaymentListController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpFinancePaymentListRespVO.class, payment -> {
+        PageResult<ErpFinancePaymentListRespVO> result = BeanUtils.toBean(pageResult, ErpFinancePaymentListRespVO.class, payment -> {
             MapUtils.findAndThen(userMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
         });
+        // 3. 附加统计数据
+        if( !CollectionUtils.isEmpty(allData.getList()) ){
+            List<Map<String, Object>> statisticsList = new ArrayList<>();
+
+            result.getList().stream().map(ErpFinancePaymentListRespVO::getFinanceUserName).distinct().collect(Collectors.toList()).forEach(
+                    e->{
+                        BigDecimal sumOfPaymentPrice = result.getList().stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getFinanceUserName())).map(ErpFinancePaymentListRespVO::getPaymentPrice).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                        Map<String, Object> statisticsMap = new HashMap<>();
+                        statisticsMap.put("name", e+"");
+                        statisticsMap.put("value", sumOfPaymentPrice);
+
+                        statisticsList.add(statisticsMap);
+                    }
+            );
+
+            result.setSide(statisticsList);
+        }
+
+        return result;
     }
 }
