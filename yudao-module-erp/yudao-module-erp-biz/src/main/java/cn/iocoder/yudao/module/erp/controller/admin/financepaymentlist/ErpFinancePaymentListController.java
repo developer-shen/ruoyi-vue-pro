@@ -116,10 +116,10 @@ public class ErpFinancePaymentListController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1. 管理员信息
+        // 1. 管理员信息（分页数据）
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
-        // 2. 开始拼接
+        // 2. 开始拼接（分页数据）
         PageResult<ErpFinancePaymentListRespVO> result = BeanUtils.toBean(pageResult, ErpFinancePaymentListRespVO.class, payment -> {
             MapUtils.findAndThen(userMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
@@ -128,9 +128,22 @@ public class ErpFinancePaymentListController {
         if( !CollectionUtils.isEmpty(allData.getList()) ){
             List<Map<String, Object>> statisticsList = new ArrayList<>();
 
-            result.getList().stream().map(ErpFinancePaymentListRespVO::getFinanceUserName).distinct().collect(Collectors.toList()).forEach(
+            // 3.1. 管理员信息（全部数据）
+            Map<Long, AdminUserRespDTO> alluserMap = adminUserApi.getUserMap(convertListByFlatMap(allData.getList(),
+                    contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
+            // 3.2. 开始拼接（全部数据）
+            PageResult<ErpFinancePaymentListRespVO> allDataVO = BeanUtils.toBean(allData, ErpFinancePaymentListRespVO.class, payment -> {
+                MapUtils.findAndThen(alluserMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
+                MapUtils.findAndThen(alluserMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
+            });
+            // 3.3. 统计数据
+            allDataVO.getList().stream().map(ErpFinancePaymentListRespVO::getFinanceUserName).distinct().collect(Collectors.toList()).forEach(
                     e->{
-                        BigDecimal sumOfPaymentPrice = result.getList().stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getFinanceUserName())).map(ErpFinancePaymentListRespVO::getPaymentPrice).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal sumOfPaymentPrice = allDataVO.getList()
+                                .stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getFinanceUserName()))
+                                .map(ErpFinancePaymentListRespVO::getPaymentPrice)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .setScale(2, BigDecimal.ROUND_HALF_UP);
 
                         Map<String, Object> statisticsMap = new HashMap<>();
                         statisticsMap.put("name", e+"");
