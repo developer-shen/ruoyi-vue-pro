@@ -13,7 +13,9 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,11 +35,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
@@ -104,11 +108,11 @@ public class ErpFinancePaymentListController {
     @PreAuthorize("@ss.hasPermission('erp:finance-payment-list:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportFinancePaymentListExcel(@Valid ErpFinancePaymentListPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                              HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpFinancePaymentListRespVO> list = buildFinancePaymentListVOPageResult(financePaymentListService.getFinancePaymentListPage(pageReqVO),null).getList();
+        List<ErpFinancePaymentListRespVO> list = buildFinancePaymentListVOPageResult(financePaymentListService.getFinancePaymentListPage(pageReqVO), null).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "ERP 付款清单.xls", "数据", ErpFinancePaymentListRespVO.class,list);
+        ExcelUtils.write(response, "ERP 付款清单.xls", "数据", ErpFinancePaymentListRespVO.class, list);
 
     }
 
@@ -125,9 +129,10 @@ public class ErpFinancePaymentListController {
             MapUtils.findAndThen(userMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
         });
         // 3. 附加统计数据
-        if( !CollectionUtils.isEmpty(allData.getList()) ){
-            List<Map<String, Object>> statisticsList = new ArrayList<>();
-
+        Map<String, Object> sideMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(allData.getList())) {
+            // A:饼状图数据
+            List<Map<String, Object>> pieOptionsDataList = new ArrayList<>();
             // 3.1. 管理员信息（全部数据）
             Map<Long, AdminUserRespDTO> alluserMap = adminUserApi.getUserMap(convertListByFlatMap(allData.getList(),
                     contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
@@ -136,26 +141,65 @@ public class ErpFinancePaymentListController {
                 MapUtils.findAndThen(alluserMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
                 MapUtils.findAndThen(alluserMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
             });
-            // 3.3. 统计数据
-            allDataVO.getList().stream().map(ErpFinancePaymentListRespVO::getFinanceUserName).distinct().collect(Collectors.toList()).forEach(
-                    e->{
-                        BigDecimal sumOfPaymentPrice = allDataVO.getList()
-                                .stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getFinanceUserName()))
-                                .map(ErpFinancePaymentListRespVO::getPaymentPrice)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                .setScale(2, BigDecimal.ROUND_HALF_UP);
+            // 3.3. 统计饼状图数据
+            allDataVO.getList().stream().map(ErpFinancePaymentListRespVO::getFinanceUserName).distinct().collect(Collectors.toList()).forEach(e -> {
+                BigDecimal sumOfPaymentPrice = allDataVO.getList()
+                        .stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getFinanceUserName()))
+                        .map(ErpFinancePaymentListRespVO::getPaymentPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
 
-                        Map<String, Object> statisticsMap = new HashMap<>();
-                        statisticsMap.put("name", e+"");
-                        statisticsMap.put("value", sumOfPaymentPrice);
+                Map<String, Object> statisticsMap = new HashMap<>();
+                statisticsMap.put("name", e + "");
+                statisticsMap.put("value", sumOfPaymentPrice);
 
-                        statisticsList.add(statisticsMap);
-                    }
-            );
+                pieOptionsDataList.add(statisticsMap);
+            });
 
-            result.setSide(statisticsList);
+            // B:柱状图数据
+            List<Map<String, Object>> barOptionsDataList = new ArrayList<>();
+            // 3.4. 统计柱状图数据
+            allDataVO.getList().stream().map(ErpFinancePaymentListRespVO::getPaymentPurpose).distinct().collect(Collectors.toList()).forEach(e -> {
+                if(!StringUtils.isEmpty(e) && !e.equals("其他") ){
+                    BigDecimal sumOfPaymentPrice = allDataVO.getList()
+                            .stream().filter(vo -> e.equals(vo.getPaymentPurpose()))
+                            .map(ErpFinancePaymentListRespVO::getPaymentPrice)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+                            .setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                    Map<String, Object> statisticsMap = new HashMap<>();
+                    statisticsMap.put("name", e + "");
+                    statisticsMap.put("value", sumOfPaymentPrice);
+
+                    barOptionsDataList.add(statisticsMap);
+                }
+            });
+            // 3.5. 统计柱状图数据(无付款用途的数据)
+            BigDecimal sumOfNonePaymentPrice = allDataVO.getList()
+                   .stream().filter(vo -> StringUtils.isEmpty(vo.getPaymentPurpose()) || vo.getPaymentPurpose().equals("其他"))
+                   .map(ErpFinancePaymentListRespVO::getPaymentPrice)
+                   .reduce(BigDecimal.ZERO, BigDecimal::add)
+                   .setScale(2, BigDecimal.ROUND_HALF_UP);
+            Map<String, Object> statisticsMapOfNonePaymentPrice = new HashMap<>();
+            statisticsMapOfNonePaymentPrice.put("name", "其他");
+            statisticsMapOfNonePaymentPrice.put("value", sumOfNonePaymentPrice);
+
+            barOptionsDataList.add(statisticsMapOfNonePaymentPrice);
+
+            // 按照 value 进行排序（BigDecimal 类型）
+            barOptionsDataList.sort((mapA, mapB) -> {
+                BigDecimal valueA = (BigDecimal) mapA.get("value");
+                BigDecimal valueB = (BigDecimal) mapB.get("value");
+                return valueA.compareTo(valueB);
+            });
+
+            // finally
+            // 填充A:饼状图数据
+            sideMap.put("pieOptionsDataList", pieOptionsDataList);
+            // 填充B:柱状图数据
+            sideMap.put("barOptionsDataList", barOptionsDataList);
         }
-
+        result.setSide(sideMap);
         return result;
     }
 }
