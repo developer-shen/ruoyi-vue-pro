@@ -57,14 +57,25 @@ public class ErpSaleStatisticsController {
         return success(summary);
     }
 
-    @GetMapping("/time-summary")
-    @Operation(summary = "获得销售时间段统计")
+    @GetMapping("/num-time-summary")
+    @Operation(summary = "获得销售订单时间段统计")
     @Parameter(name = "count", description = "时间段数量", example = "6")
     @PreAuthorize("@ss.hasPermission('erp:statistics:query')")
-    public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleTimeSummary(
+    public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleNumTimeSummary(
             @RequestParam(value = "count", defaultValue = "30") Integer count) {
 
-        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleSummaryOfCustomer(count);
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleNumSummaryOfCustomer(count);
+        return success(summaryList);
+    }
+
+    @GetMapping("/money-time-summary")
+    @Operation(summary = "获得销售金额时间段统计")
+    @Parameter(name = "count", description = "时间段数量", example = "6")
+    @PreAuthorize("@ss.hasPermission('erp:statistics:query')")
+    public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleMoneyTimeSummary(
+            @RequestParam(value = "count", defaultValue = "30") Integer count) {
+
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleMoneySummaryOfCustomer(count);
         return success(summaryList);
     }
 

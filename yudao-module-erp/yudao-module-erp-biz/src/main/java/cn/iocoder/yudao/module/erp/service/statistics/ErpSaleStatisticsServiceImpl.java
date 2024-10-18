@@ -54,7 +54,7 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
      * @return
      */
     @Override
-    public List<ErpSaleTimeSummaryRespVO> getSaleSummaryOfCustomer(Integer count) {
+    public List<ErpSaleTimeSummaryRespVO> getSaleNumSummaryOfCustomer(Integer count) {
 
         List<ErpSaleTimeSummaryRespVO> summaryList = new ArrayList<>();
 
@@ -94,4 +94,50 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
         return summaryList;
     }
 
+
+
+    /**
+     * 获得平台销售金额统计
+     * @param count 日期范围
+     * @return
+     */
+    @Override
+    public List<ErpSaleTimeSummaryRespVO> getSaleMoneySummaryOfCustomer(Integer count){
+        List<ErpSaleTimeSummaryRespVO> summaryList = new ArrayList<>();
+
+        // 获取全部客户名称
+        ErpCustomerPageReqVO customerPageReqVO = new ErpCustomerPageReqVO();
+        List<ErpCustomerDO> customerList = customerService.getCustomerPage(customerPageReqVO).getList();
+
+        // 获取全部销售订单
+        ErpSaleOrderPageReqVO saleOrderPageReqVO = new ErpSaleOrderPageReqVO();
+        saleOrderPageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<ErpSaleOrderDO> allSaleOrderList = saleOrderService.getSaleOrderPage(saleOrderPageReqVO).getList();
+
+
+        for (int i = count - 1; i >= 0; i--) {
+            // 订单日期
+            LocalDateTime startTime = LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(i));
+            ErpSaleTimeSummaryRespVO erpSaleTimeSummaryRespVO = new ErpSaleTimeSummaryRespVO();
+            erpSaleTimeSummaryRespVO.setTime(LocalDateTimeUtil.format(startTime, NORM_DATE_PATTERN));
+
+            // 平台及销售金额
+            Map<String, Object> dataMap = new HashMap<>();
+            for (ErpCustomerDO customer : customerList) {
+                // 订单日期的订单列表
+                List<ErpSaleOrderDO> saleOrderList = allSaleOrderList.stream()
+                        .filter(e -> e.getCustomerId().equals(customer.getId())
+                                && e.getOrderTime().isEqual(startTime))
+                        .collect(Collectors.toList());
+                // 销售金额
+                BigDecimal saleMoney = CollectionUtils.isEmpty(saleOrderList) ? BigDecimal.ZERO : saleOrderList.stream().map(e -> e.getTotalPrice()).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                dataMap.put(customer.getName(), saleMoney);
+            }
+            erpSaleTimeSummaryRespVO.setData(dataMap);
+            summaryList.add(erpSaleTimeSummaryRespVO);
+        }
+
+        return summaryList;
+    }
 }

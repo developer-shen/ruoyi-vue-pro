@@ -31,6 +31,13 @@ public interface ErpSaleStatisticsService {
      * @param count 日期范围
      * @return
      */
-    List<ErpSaleTimeSummaryRespVO> getSaleSummaryOfCustomer(Integer count);
+    List<ErpSaleTimeSummaryRespVO> getSaleNumSummaryOfCustomer(Integer count);
+
+    /**
+     * 获得平台销售金额统计
+     * @param count 日期范围
+     * @return
+     */
+    List<ErpSaleTimeSummaryRespVO> getSaleMoneySummaryOfCustomer(Integer count);
 
 }
