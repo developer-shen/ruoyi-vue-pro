@@ -127,16 +127,18 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
-        Map<Long, ErpProductCategoryDO> categoryMap = productCategoryService.getProductCategoryMap(
-                convertSet(list, ErpProductDO::getCategoryId));
-        Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
-                convertSet(list, ErpProductDO::getUnitId));
-        return BeanUtils.toBean(list, ErpProductRespVO.class, product -> {
-            MapUtils.findAndThen(categoryMap, product.getCategoryId(),
-                    category -> product.setCategoryName(category.getName()));
-            MapUtils.findAndThen(unitMap, product.getUnitId(),
-                    unit -> product.setUnitName(unit.getName()));
-        });
+//        Map<Long, ErpProductCategoryDO> categoryMap = productCategoryService.getProductCategoryMap(
+//                convertSet(list, ErpProductDO::getCategoryId));
+//        Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
+//                convertSet(list, ErpProductDO::getUnitId));
+//        return BeanUtils.toBean(list, ErpProductRespVO.class, product -> {
+//            MapUtils.findAndThen(categoryMap, product.getCategoryId(),
+//                    category -> product.setCategoryName(category.getName()));
+//            MapUtils.findAndThen(unitMap, product.getUnitId(),
+//                    unit -> product.setUnitName(unit.getName()));
+//        });
+
+        return BeanUtils.toBean(list, ErpProductRespVO.class);
     }
 
     @Override

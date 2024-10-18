@@ -2,9 +2,16 @@ package cn.iocoder.yudao.module.erp.controller.admin.statistics;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.financepaymentlist.vo.ErpFinancePaymentListPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.statistics.vo.sale.ErpSaleSummaryRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.statistics.vo.sale.ErpSaleTimeSummaryRespVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpCustomerDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOrderService;
 import cn.iocoder.yudao.module.erp.service.statistics.ErpSaleStatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
 import static cn.hutool.core.date.DatePattern.NORM_MONTH_PATTERN;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -54,15 +62,9 @@ public class ErpSaleStatisticsController {
     @Parameter(name = "count", description = "时间段数量", example = "6")
     @PreAuthorize("@ss.hasPermission('erp:statistics:query')")
     public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleTimeSummary(
-            @RequestParam(value = "count", defaultValue = "6") Integer count) {
-        List<ErpSaleTimeSummaryRespVO> summaryList = new ArrayList<>();
-        for (int i = count - 1; i >= 0; i--) {
-            LocalDateTime startTime = LocalDateTimeUtils.beginOfMonth(LocalDateTime.now().minusMonths(i));
-            LocalDateTime endTime = LocalDateTimeUtils.endOfMonth(startTime);
-            summaryList.add(new ErpSaleTimeSummaryRespVO()
-                    .setTime(LocalDateTimeUtil.format(startTime, NORM_MONTH_PATTERN))
-                    .setPrice(saleStatisticsService.getSalePrice(startTime, endTime)));
-        }
+            @RequestParam(value = "count", defaultValue = "30") Integer count) {
+
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleSummaryOfCustomer(count);
         return success(summaryList);
     }
 

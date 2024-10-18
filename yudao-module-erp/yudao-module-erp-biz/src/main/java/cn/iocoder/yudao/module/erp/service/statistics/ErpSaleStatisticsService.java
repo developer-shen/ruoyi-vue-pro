@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.erp.service.statistics;
 
+import cn.iocoder.yudao.module.erp.controller.admin.statistics.vo.sale.ErpSaleTimeSummaryRespVO;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ERP 销售统计 Service 接口
@@ -20,5 +24,13 @@ public interface ErpSaleStatisticsService {
      * @return 销售金额
      */
     BigDecimal getSalePrice(LocalDateTime beginTime, LocalDateTime endTime);
+
+
+    /**
+     * 获得平台销售量统计
+     * @param count 日期范围
+     * @return
+     */
+    List<ErpSaleTimeSummaryRespVO> getSaleSummaryOfCustomer(Integer count);
 
 }
