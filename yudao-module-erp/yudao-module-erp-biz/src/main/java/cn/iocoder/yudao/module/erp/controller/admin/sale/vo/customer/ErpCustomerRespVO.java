@@ -11,17 +11,17 @@ import com.alibaba.excel.annotation.*;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
-@Schema(description = "管理后台 - ERP 客户 Response VO")
+@Schema(description = "管理后台 - ERP 平台 Response VO")
 @Data
 @ExcelIgnoreUnannotated
 public class ErpCustomerRespVO {
 
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "27520")
-    @ExcelProperty("客户编号")
+    @Schema(description = "平台编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "27520")
+    @ExcelProperty("平台编号")
     private Long id;
 
-    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
-    @ExcelProperty("客户名称")
+    @Schema(description = "平台名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+    @ExcelProperty("平台名称")
     private String name;
 
     @Schema(description = "联系人", example = "老王")

@@ -14,20 +14,17 @@ public class ProductSaveReqVO {
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15672")
     private Long id;
 
-    @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
-    @NotEmpty(message = "产品名称不能为空")
+    @Schema(description = "skc货号", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
+    @NotEmpty(message = "skc货号不能为空")
     private String name;
 
-    @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
-    @NotEmpty(message = "产品条码不能为空")
+    @Schema(description = "产品条码", example = "X110")
     private String barCode;
 
-    @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11161")
-    @NotNull(message = "产品分类编号不能为空")
+    @Schema(description = "产品分类编号", example = "11161")
     private Long categoryId;
 
-    @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8869")
-    @NotNull(message = "单位编号不能为空")
+    @Schema(description = "单位编号", example = "8869")
     private Long unitId;
 
     @Schema(description = "产品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
