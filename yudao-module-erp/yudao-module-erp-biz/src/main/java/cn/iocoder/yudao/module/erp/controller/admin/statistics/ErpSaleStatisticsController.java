@@ -64,7 +64,7 @@ public class ErpSaleStatisticsController {
     public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleNumTimeSummary(
             @RequestParam(value = "count", defaultValue = "30") Integer count) {
 
-        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleNumSummaryOfCustomer(count);
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleNumSummary(count);
         return success(summaryList);
     }
 
@@ -75,7 +75,19 @@ public class ErpSaleStatisticsController {
     public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleMoneyTimeSummary(
             @RequestParam(value = "count", defaultValue = "30") Integer count) {
 
-        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleMoneySummaryOfCustomer(count);
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleMoneySummary(count);
+        return success(summaryList);
+    }
+
+    @GetMapping("/skc-num-time-summary")
+    @Operation(summary = "获得skc销售订单时间段统计")
+    @Parameter(name = "count", description = "时间段数量", example = "6")
+    @PreAuthorize("@ss.hasPermission('erp:statistics:query')")
+    public CommonResult<List<ErpSaleTimeSummaryRespVO>> getSaleSkcNumTimeSummary(
+            @RequestParam(value = "count", defaultValue = "7") Integer count,
+            @RequestParam(value = "customerId") Long customerId) {
+
+        List<ErpSaleTimeSummaryRespVO> summaryList = saleStatisticsService.getSaleSkcNumSummaryOfCustomer(count, customerId);
         return success(summaryList);
     }
 
