@@ -73,8 +73,8 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
         saleOrderPageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSaleOrderDO> allSaleOrderList = saleOrderService.getSaleOrderPage(saleOrderPageReqVO).getList();
 
-
-        for (int i = count - 1; i >= 0; i--) {
+        // i>=2 截止到两天前，因为平台数据只能到两天前
+        for (int i = count + 1; i >= 2; i--) {
             // 订单日期
             LocalDateTime startTime = LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(i));
             ErpSaleTimeSummaryRespVO erpSaleTimeSummaryRespVO = new ErpSaleTimeSummaryRespVO();
@@ -121,7 +121,8 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
         List<ErpSaleOrderDO> allSaleOrderList = saleOrderService.getSaleOrderPage(saleOrderPageReqVO).getList();
 
 
-        for (int i = count - 1; i >= 0; i--) {
+        // i>=2 截止到两天前，因为平台数据只能到两天前
+        for (int i = count + 1; i >= 2; i--) {
             // 订单日期
             LocalDateTime startTime = LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(i));
             ErpSaleTimeSummaryRespVO erpSaleTimeSummaryRespVO = new ErpSaleTimeSummaryRespVO();
@@ -169,7 +170,8 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
         saleOrderPageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSaleOrderDO> allSaleOrderList = saleOrderService.getSaleOrderPage(saleOrderPageReqVO).getList();
 
-        for (int i = count - 1; i >= 0; i--) {
+        // i>=2 截止到两天前，因为平台数据只能到两天前
+        for (int i = count + 1; i >= 2; i--) {
             // 订单日期
             LocalDateTime startTime = LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(i));
             ErpSaleTimeSummaryRespVO erpSaleTimeSummaryRespVO = new ErpSaleTimeSummaryRespVO();
