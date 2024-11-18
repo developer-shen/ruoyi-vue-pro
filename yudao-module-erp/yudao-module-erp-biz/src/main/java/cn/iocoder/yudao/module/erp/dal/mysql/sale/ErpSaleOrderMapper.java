@@ -29,7 +29,8 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
                 .eqIfPresent(ErpSaleOrderDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpSaleOrderDO::getRemark, reqVO.getRemark())
                 .eqIfPresent(ErpSaleOrderDO::getCreator, reqVO.getCreator())
-                .orderByDesc(ErpSaleOrderDO::getId);
+                .orderByDesc(ErpSaleOrderDO::getOrderTime)
+                .orderByDesc(ErpSaleOrderDO::getCustomerId);
         // 入库状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报 out_count 错误
         if (Objects.equals(reqVO.getOutStatus(), ErpSaleOrderPageReqVO.OUT_STATUS_NONE)) {
             query.eq(ErpSaleOrderDO::getOutCount, 0);

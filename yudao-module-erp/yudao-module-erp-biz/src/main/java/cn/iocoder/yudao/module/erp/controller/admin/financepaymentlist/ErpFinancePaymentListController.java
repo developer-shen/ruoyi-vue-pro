@@ -180,11 +180,13 @@ public class ErpFinancePaymentListController {
                    .map(ErpFinancePaymentListRespVO::getPaymentPrice)
                    .reduce(BigDecimal.ZERO, BigDecimal::add)
                    .setScale(2, BigDecimal.ROUND_HALF_UP);
-            Map<String, Object> statisticsMapOfNonePaymentPrice = new HashMap<>();
-            statisticsMapOfNonePaymentPrice.put("name", "其他");
-            statisticsMapOfNonePaymentPrice.put("value", sumOfNonePaymentPrice);
 
-            barOptionsDataList.add(statisticsMapOfNonePaymentPrice);
+            if(sumOfNonePaymentPrice.intValue() != 0) {
+                Map<String, Object> statisticsMapOfNonePaymentPrice = new HashMap<>();
+                statisticsMapOfNonePaymentPrice.put("name", "其他");
+                statisticsMapOfNonePaymentPrice.put("value", sumOfNonePaymentPrice);
+                barOptionsDataList.add(statisticsMapOfNonePaymentPrice);
+            }
 
             // 按照 value 进行排序（BigDecimal 类型）
             barOptionsDataList.sort((mapA, mapB) -> {
