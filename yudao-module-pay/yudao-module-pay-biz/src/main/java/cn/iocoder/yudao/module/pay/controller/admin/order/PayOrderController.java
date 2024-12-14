@@ -112,7 +112,7 @@ public class PayOrderController {
             HttpServletResponse response) throws IOException {
         List<PayOrderDO> list = orderService.getOrderList(exportReqVO);
         if (CollectionUtil.isEmpty(list)) {
-            ExcelUtils.write(response, "支付订单.xls", "数据",
+            ExcelUtils.write(response, "支付订单.xlsx", "数据",
                     PayOrderExcelVO.class, new ArrayList<>());
             return;
         }
@@ -121,7 +121,7 @@ public class PayOrderController {
         Map<Long, PayAppDO> appMap = appService.getAppMap(convertList(list, PayOrderDO::getAppId));
         List<PayOrderExcelVO> excelList = PayOrderConvert.INSTANCE.convertList(list, appMap);
         // 导出 Excel
-        ExcelUtils.write(response, "支付订单.xls", "数据", PayOrderExcelVO.class, excelList);
+        ExcelUtils.write(response, "支付订单.xlsx", "数据", PayOrderExcelVO.class, excelList);
     }
 
 }

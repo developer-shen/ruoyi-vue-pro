@@ -109,7 +109,7 @@ public class ErpWarehouseController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpWarehouseDO> list = warehouseService.getWarehousePage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "仓库.xls", "数据", ErpWarehouseRespVO.class,
+        ExcelUtils.write(response, "仓库.xlsx", "数据", ErpWarehouseRespVO.class,
                         BeanUtils.toBean(list, ErpWarehouseRespVO.class));
     }
 

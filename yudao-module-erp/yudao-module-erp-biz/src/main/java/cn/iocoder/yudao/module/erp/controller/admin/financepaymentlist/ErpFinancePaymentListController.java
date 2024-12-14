@@ -112,7 +112,7 @@ public class ErpFinancePaymentListController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpFinancePaymentListRespVO> list = buildFinancePaymentListVOPageResult(financePaymentListService.getFinancePaymentListPage(pageReqVO), null).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "ERP 付款清单.xls", "数据", ErpFinancePaymentListRespVO.class, list);
+        ExcelUtils.write(response, "ERP 付款清单.xlsxx", "数据", ErpFinancePaymentListRespVO.class, list);
 
     }
 
@@ -130,7 +130,7 @@ public class ErpFinancePaymentListController {
         });
         // 3. 附加统计数据
         Map<String, Object> sideMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(allData.getList())) {
+        if (allData!= null && !CollectionUtils.isEmpty(allData.getList())) {
             // A:饼状图数据
             List<Map<String, Object>> pieOptionsDataList = new ArrayList<>();
             // 3.1. 管理员信息（全部数据）

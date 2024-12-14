@@ -98,7 +98,7 @@ public class ErpProductController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
+        ExcelUtils.write(response, "产品.xlsx", "数据", ErpProductRespVO.class,
                 pageResult.getList());
     }
 

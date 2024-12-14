@@ -53,7 +53,7 @@ public class SmsLogController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<SmsLogDO> list = smsLogService.getSmsLogPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "短信日志.xls", "数据", SmsLogRespVO.class,
+        ExcelUtils.write(response, "短信日志.xlsx", "数据", SmsLogRespVO.class,
                 BeanUtils.toBean(list, SmsLogRespVO.class));
     }
 

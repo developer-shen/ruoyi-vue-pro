@@ -18,9 +18,9 @@ public class ErpFinancePaymentListRespVO {
     private Long id;
 
     @Schema(description = "财务人员编号", example = "4904")
-    @ExcelProperty("财务人员")
     private Long financeUserId;
     @Schema(description = "财务人员名称", example = "张三")
+    @ExcelProperty("财务人员")
     private String financeUserName;
 
     @Schema(description = "付款时间", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -53,7 +53,6 @@ public class ErpFinancePaymentListRespVO {
     private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
 }

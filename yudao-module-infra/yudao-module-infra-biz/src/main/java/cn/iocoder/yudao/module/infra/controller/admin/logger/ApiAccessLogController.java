@@ -53,7 +53,7 @@ public class ApiAccessLogController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ApiAccessLogDO> list = apiAccessLogService.getApiAccessLogPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "API 访问日志.xls", "数据", ApiAccessLogRespVO.class,
+        ExcelUtils.write(response, "API 访问日志.xlsx", "数据", ApiAccessLogRespVO.class,
                 BeanUtils.toBean(list, ApiAccessLogRespVO.class));
     }
 

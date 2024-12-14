@@ -100,7 +100,7 @@ public class CrmProductController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<CrmProductDO> list = productService.getProductPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "产品.xls", "数据", CrmProductRespVO.class,
+        ExcelUtils.write(response, "产品.xlsx", "数据", CrmProductRespVO.class,
                 TranslateUtils.translate(BeanUtils.toBean(list, CrmProductRespVO.class)));
     }
 

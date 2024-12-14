@@ -94,7 +94,7 @@ public class ErpProductCategoryController {
               HttpServletResponse response) throws IOException {
         List<ErpProductCategoryDO> list = productCategoryService.getProductCategoryList(listReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品分类.xls", "数据", ErpProductCategoryRespVO.class,
+        ExcelUtils.write(response, "产品分类.xlsx", "数据", ErpProductCategoryRespVO.class,
                         BeanUtils.toBean(list, ErpProductCategoryRespVO.class));
     }
 

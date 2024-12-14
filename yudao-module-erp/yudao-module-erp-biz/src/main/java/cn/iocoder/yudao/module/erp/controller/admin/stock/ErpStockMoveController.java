@@ -127,7 +127,7 @@ public class ErpStockMoveController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpStockMoveRespVO> list = buildStockMoveVOPageResult(stockMoveService.getStockMovePage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "库存调拨单.xls", "数据", ErpStockMoveRespVO.class, list);
+        ExcelUtils.write(response, "库存调拨单.xlsx", "数据", ErpStockMoveRespVO.class, list);
     }
 
     private PageResult<ErpStockMoveRespVO> buildStockMoveVOPageResult(PageResult<ErpStockMoveDO> pageResult) {

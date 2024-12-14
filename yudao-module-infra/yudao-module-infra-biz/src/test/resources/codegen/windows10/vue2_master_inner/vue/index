@@ -211,7 +211,7 @@ export default {
       try {
         this.exportLoading = true;
         const res = await StudentApi.exportStudentExcel(this.queryParams);
-        this.$download.excel(res.data, '学生.xls');
+        this.$download.excel(res.data, '学生.xlsx');
       } catch {
       } finally {
         this.exportLoading = false;

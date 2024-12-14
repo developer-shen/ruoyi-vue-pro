@@ -92,7 +92,7 @@ public class TradeStatisticsController {
         // 导出 Excel
         List<TradeTrendSummaryRespVO> voList = TradeStatisticsConvert.INSTANCE.convertList(list);
         List<TradeTrendSummaryExcelVO> data = TradeStatisticsConvert.INSTANCE.convertList02(voList);
-        ExcelUtils.write(response, "交易状况.xls", "数据", TradeTrendSummaryExcelVO.class, data);
+        ExcelUtils.write(response, "交易状况.xlsx", "数据", TradeTrendSummaryExcelVO.class, data);
     }
 
     @GetMapping("/order-count")

@@ -66,7 +66,7 @@ public class ProductStatisticsController {
         List<ProductStatisticsDO> list = productStatisticsService.getProductStatisticsList(reqVO);
         // 导出 Excel
         List<ProductStatisticsRespVO> voList = BeanUtils.toBean(list, ProductStatisticsRespVO.class);
-        ExcelUtils.write(response, "商品状况.xls", "数据", ProductStatisticsRespVO.class, voList);
+        ExcelUtils.write(response, "商品状况.xlsx", "数据", ProductStatisticsRespVO.class, voList);
     }
 
     @GetMapping("/rank-page")

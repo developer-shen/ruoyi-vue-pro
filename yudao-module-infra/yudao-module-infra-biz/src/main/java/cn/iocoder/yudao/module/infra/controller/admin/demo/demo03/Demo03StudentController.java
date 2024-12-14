@@ -88,7 +88,7 @@ public class Demo03StudentController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<Demo03StudentDO> list = demo03StudentService.getDemo03StudentPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "学生.xls", "数据", Demo03StudentRespVO.class,
+        ExcelUtils.write(response, "学生.xlsx", "数据", Demo03StudentRespVO.class,
                         BeanUtils.toBean(list, Demo03StudentRespVO.class));
     }
 

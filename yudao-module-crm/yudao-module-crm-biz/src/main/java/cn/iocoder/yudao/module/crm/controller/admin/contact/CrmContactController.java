@@ -146,7 +146,7 @@ public class CrmContactController {
                                    HttpServletResponse response) throws IOException {
         exportReqVO.setPageNo(PAGE_SIZE_NONE);
         List<CrmContactDO> list = contactService.getContactPage(exportReqVO, getLoginUserId()).getList();
-        ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class, buildContactDetailList(list));
+        ExcelUtils.write(response, "联系人.xlsx", "数据", CrmContactRespVO.class, buildContactDetailList(list));
     }
 
     private List<CrmContactRespVO> buildContactDetailList(List<CrmContactDO> contactList) {

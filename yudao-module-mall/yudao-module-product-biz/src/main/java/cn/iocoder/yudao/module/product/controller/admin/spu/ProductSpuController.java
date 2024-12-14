@@ -133,7 +133,7 @@ public class ProductSpuController {
         reqVO.setPageSize(PAGE_SIZE_NONE);
         List<ProductSpuDO> list = productSpuService.getSpuPage(reqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "商品列表.xls", "数据", ProductSpuRespVO.class,
+        ExcelUtils.write(response, "商品列表.xlsx", "数据", ProductSpuRespVO.class,
                 BeanUtils.toBean(list, ProductSpuRespVO.class));
     }
 

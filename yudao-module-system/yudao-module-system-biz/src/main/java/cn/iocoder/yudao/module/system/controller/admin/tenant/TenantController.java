@@ -104,7 +104,7 @@ public class TenantController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<TenantDO> list = tenantService.getTenantPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "租户.xls", "数据", TenantRespVO.class,
+        ExcelUtils.write(response, "租户.xlsx", "数据", TenantRespVO.class,
                 BeanUtils.toBean(list, TenantRespVO.class));
     }
 

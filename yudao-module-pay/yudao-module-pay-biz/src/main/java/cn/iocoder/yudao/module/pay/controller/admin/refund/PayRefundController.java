@@ -81,7 +81,7 @@ public class PayRefundController {
             HttpServletResponse response) throws IOException {
         List<PayRefundDO> list = refundService.getRefundList(exportReqVO);
         if (CollectionUtil.isEmpty(list)) {
-            ExcelUtils.write(response, "退款订单.xls", "数据",
+            ExcelUtils.write(response, "退款订单.xlsx", "数据",
                     PayRefundExcelVO.class, new ArrayList<>());
             return;
         }
@@ -90,7 +90,7 @@ public class PayRefundController {
         Map<Long, PayAppDO> appMap = appService.getAppMap(convertList(list, PayRefundDO::getAppId));
         List<PayRefundExcelVO> excelList = PayRefundConvert.INSTANCE.convertList(list, appMap);
         // 导出 Excel
-        ExcelUtils.write(response, "退款订单.xls", "数据", PayRefundExcelVO.class, excelList);
+        ExcelUtils.write(response, "退款订单.xlsx", "数据", PayRefundExcelVO.class, excelList);
     }
 
 }

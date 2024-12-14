@@ -131,7 +131,7 @@ public class ErpSaleOutController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSaleOutRespVO> list = buildSaleOutVOPageResult(saleOutService.getSaleOutPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "销售出库.xls", "数据", ErpSaleOutRespVO.class, list);
+        ExcelUtils.write(response, "销售出库.xlsx", "数据", ErpSaleOutRespVO.class, list);
     }
 
     private PageResult<ErpSaleOutRespVO> buildSaleOutVOPageResult(PageResult<ErpSaleOutDO> pageResult) {

@@ -138,7 +138,7 @@ public class UserController {
         // 输出 Excel
         Map<Long, DeptDO> deptMap = deptService.getDeptMap(
                 convertList(list, AdminUserDO::getDeptId));
-        ExcelUtils.write(response, "用户数据.xls", "数据", UserRespVO.class,
+        ExcelUtils.write(response, "用户数据.xlsx", "数据", UserRespVO.class,
                 UserConvert.INSTANCE.convertList(list, deptMap));
     }
 
@@ -153,7 +153,7 @@ public class UserController {
                         .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SexEnum.FEMALE.getSex()).build()
         );
         // 输出
-        ExcelUtils.write(response, "用户导入模板.xls", "用户列表", UserImportExcelVO.class, list);
+        ExcelUtils.write(response, "用户导入模板.xlsx", "用户列表", UserImportExcelVO.class, list);
     }
 
     @PostMapping("/import")

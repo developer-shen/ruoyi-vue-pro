@@ -117,7 +117,7 @@ public class CrmClueController {
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmClueDO> list = clueService.getCluePage(pageReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "线索.xls", "数据", CrmClueRespVO.class, buildClueDetailList(list));
+        ExcelUtils.write(response, "线索.xlsx", "数据", CrmClueRespVO.class, buildClueDetailList(list));
     }
 
     private List<CrmClueRespVO> buildClueDetailList(List<CrmClueDO> list) {

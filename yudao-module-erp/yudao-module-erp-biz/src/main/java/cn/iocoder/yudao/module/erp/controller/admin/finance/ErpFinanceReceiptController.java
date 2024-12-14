@@ -120,7 +120,7 @@ public class ErpFinanceReceiptController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpFinanceReceiptRespVO> list = buildFinanceReceiptVOPageResult(financeReceiptService.getFinanceReceiptPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "收款单.xls", "数据", ErpFinanceReceiptRespVO.class, list);
+        ExcelUtils.write(response, "收款单.xlsx", "数据", ErpFinanceReceiptRespVO.class, list);
     }
 
     private PageResult<ErpFinanceReceiptRespVO> buildFinanceReceiptVOPageResult(PageResult<ErpFinanceReceiptDO> pageResult) {

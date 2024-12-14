@@ -52,7 +52,7 @@ public class OperateLogController {
     public void exportOperateLog(HttpServletResponse response, @Valid OperateLogPageReqVO exportReqVO) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperateLogDO> list = operateLogService.getOperateLogPage(exportReqVO).getList();
-        ExcelUtils.write(response, "操作日志.xls", "数据列表", OperateLogRespVO.class,
+        ExcelUtils.write(response, "操作日志.xlsx", "数据列表", OperateLogRespVO.class,
                 TranslateUtils.translate(BeanUtils.toBean(list, OperateLogRespVO.class)));
     }
 

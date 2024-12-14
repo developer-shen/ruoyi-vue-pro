@@ -129,7 +129,7 @@ public class CrmReceivablePlanController {
         exportReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmReceivablePlanDO> list = receivablePlanService.getReceivablePlanPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "回款计划.xls", "数据", CrmReceivablePlanRespVO.class,
+        ExcelUtils.write(response, "回款计划.xlsx", "数据", CrmReceivablePlanRespVO.class,
                 buildReceivableDetailList(list));
     }
 

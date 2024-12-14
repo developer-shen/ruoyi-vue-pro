@@ -142,7 +142,7 @@ export default {
       try {
         this.exportLoading = true;
         const res = await CategoryApi.exportCategoryExcel(this.queryParams);
-        this.$download.excel(res.data, '分类.xls');
+        this.$download.excel(res.data, '分类.xlsx');
       } catch {
       } finally {
         this.exportLoading = false;

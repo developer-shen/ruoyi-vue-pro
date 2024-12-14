@@ -130,7 +130,7 @@ public class CrmReceivableController {
         exportReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmReceivableDO> list = receivableService.getReceivablePage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "回款.xls", "数据", CrmReceivableRespVO.class,
+        ExcelUtils.write(response, "回款.xlsx", "数据", CrmReceivableRespVO.class,
                 buildReceivableDetailList(list));
     }
 

@@ -240,7 +240,7 @@ public class CrmCustomerController {
         pageVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class,
+        ExcelUtils.write(response, "客户.xlsx", "数据", CrmCustomerRespVO.class,
                 buildCustomerDetailList(list));
     }
 
@@ -257,7 +257,7 @@ public class CrmCustomerController {
                         .areaId(null).detailAddress("").remark("").build()
         );
         // 输出
-        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
+        ExcelUtils.write(response, "客户导入模板.xlsx", "客户列表", CrmCustomerImportExcelVO.class, list);
     }
 
     @PostMapping("/import")

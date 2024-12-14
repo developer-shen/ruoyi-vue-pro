@@ -88,7 +88,7 @@ public class InfraStudentController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<InfraStudentDO> list = studentService.getStudentPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "学生.xls", "数据", InfraStudentRespVO.class,
+        ExcelUtils.write(response, "学生.xlsx", "数据", InfraStudentRespVO.class,
                         BeanUtils.toBean(list, InfraStudentRespVO.class));
     }
 

@@ -109,7 +109,7 @@ public class ErpAccountController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpAccountDO> list = accountService.getAccountPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "结算账户.xls", "数据", ErpAccountRespVO.class,
+        ExcelUtils.write(response, "结算账户.xlsx", "数据", ErpAccountRespVO.class,
                         BeanUtils.toBean(list, ErpAccountRespVO.class));
     }
 

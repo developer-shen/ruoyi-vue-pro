@@ -130,7 +130,7 @@ public class ErpSaleOrderController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSaleOrderRespVO> list = buildSaleOrderVOPageResult(saleOrderService.getSaleOrderPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "销售订单.xls", "数据", ErpSaleOrderRespVO.class, list);
+        ExcelUtils.write(response, "销售订单.xlsx", "数据", ErpSaleOrderRespVO.class, list);
     }
 
     private PageResult<ErpSaleOrderRespVO> buildSaleOrderVOPageResult(PageResult<ErpSaleOrderDO> pageResult) {

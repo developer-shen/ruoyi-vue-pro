@@ -67,7 +67,7 @@ public class ApiErrorLogController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ApiErrorLogDO> list = apiErrorLogService.getApiErrorLogPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "API 错误日志.xls", "数据", ApiErrorLogRespVO.class,
+        ExcelUtils.write(response, "API 错误日志.xlsx", "数据", ApiErrorLogRespVO.class,
                 BeanUtils.toBean(list, ApiErrorLogRespVO.class));
     }
 

@@ -87,7 +87,7 @@ public class InfraCategoryController {
               HttpServletResponse response) throws IOException {
         List<InfraCategoryDO> list = categoryService.getCategoryList(listReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "分类.xls", "数据", InfraCategoryRespVO.class,
+        ExcelUtils.write(response, "分类.xlsx", "数据", InfraCategoryRespVO.class,
                         BeanUtils.toBean(list, InfraCategoryRespVO.class));
     }
 

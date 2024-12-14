@@ -99,7 +99,7 @@ public class ConfigController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ConfigDO> list = configService.getConfigPage(exportReqVO).getList();
         // 输出
-        ExcelUtils.write(response, "参数配置.xls", "数据", ConfigRespVO.class,
+        ExcelUtils.write(response, "参数配置.xlsx", "数据", ConfigRespVO.class,
                 ConfigConvert.INSTANCE.convertList(list));
     }
 

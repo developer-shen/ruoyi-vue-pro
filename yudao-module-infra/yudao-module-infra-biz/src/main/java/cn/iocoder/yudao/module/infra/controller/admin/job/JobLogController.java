@@ -64,7 +64,7 @@ public class JobLogController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<JobLogDO> list = jobLogService.getJobLogPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "任务日志.xls", "数据", JobLogRespVO.class,
+        ExcelUtils.write(response, "任务日志.xlsx", "数据", JobLogRespVO.class,
                 BeanUtils.toBean(list, JobLogRespVO.class));
     }
 

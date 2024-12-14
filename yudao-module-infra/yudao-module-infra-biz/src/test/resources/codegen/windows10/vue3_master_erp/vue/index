@@ -258,7 +258,7 @@ const handleExport = async () => {
     // 发起导出
     exportLoading.value = true
     const data = await StudentApi.exportStudent(queryParams)
-    download.excel(data, '学生.xls')
+    download.excel(data, '学生.xlsx')
   } catch {
   } finally {
     exportLoading.value = false

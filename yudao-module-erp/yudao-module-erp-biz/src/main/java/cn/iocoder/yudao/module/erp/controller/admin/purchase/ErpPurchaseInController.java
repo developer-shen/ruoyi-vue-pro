@@ -131,7 +131,7 @@ public class ErpPurchaseInController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpPurchaseInRespVO> list = buildPurchaseInVOPageResult(purchaseInService.getPurchaseInPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInRespVO.class, list);
+        ExcelUtils.write(response, "采购入库.xlsx", "数据", ErpPurchaseInRespVO.class, list);
     }
 
     private PageResult<ErpPurchaseInRespVO> buildPurchaseInVOPageResult(PageResult<ErpPurchaseInDO> pageResult) {

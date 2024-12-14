@@ -124,7 +124,7 @@ public class JobController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<JobDO> list = jobService.getJobPage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "定时任务.xls", "数据", JobRespVO.class,
+        ExcelUtils.write(response, "定时任务.xlsx", "数据", JobRespVO.class,
                 BeanUtils.toBean(list, JobRespVO.class));
     }
 

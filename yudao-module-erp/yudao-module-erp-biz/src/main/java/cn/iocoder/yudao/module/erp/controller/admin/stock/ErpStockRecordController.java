@@ -81,7 +81,7 @@ public class ErpStockRecordController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpStockRecordRespVO> list = buildStockRecrodVOPageResult(stockRecordService.getStockRecordPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "产品库存明细.xls", "数据", ErpStockRecordRespVO.class, list);
+        ExcelUtils.write(response, "产品库存明细.xlsx", "数据", ErpStockRecordRespVO.class, list);
     }
 
     private PageResult<ErpStockRecordRespVO> buildStockRecrodVOPageResult(PageResult<ErpStockRecordDO> pageResult) {

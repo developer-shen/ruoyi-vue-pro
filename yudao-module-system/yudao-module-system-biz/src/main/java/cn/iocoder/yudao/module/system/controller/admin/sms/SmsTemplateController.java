@@ -85,7 +85,7 @@ public class SmsTemplateController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<SmsTemplateDO> list = smsTemplateService.getSmsTemplatePage(exportReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "短信模板.xls", "数据", SmsTemplateRespVO.class,
+        ExcelUtils.write(response, "短信模板.xlsx", "数据", SmsTemplateRespVO.class,
                 BeanUtils.toBean(list, SmsTemplateRespVO.class));
     }
 

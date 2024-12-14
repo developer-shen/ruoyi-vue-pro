@@ -173,7 +173,7 @@ public class CrmBusinessController {
         exportReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmBusinessDO> list = businessService.getBusinessPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "商机.xls", "数据", CrmBusinessRespVO.class,
+        ExcelUtils.write(response, "商机.xlsx", "数据", CrmBusinessRespVO.class,
                 buildBusinessDetailList(list));
     }
 

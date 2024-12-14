@@ -95,7 +95,7 @@ public class ErpCustomerController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpCustomerDO> list = customerService.getCustomerPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "客户.xls", "数据", ErpCustomerRespVO.class,
+        ExcelUtils.write(response, "客户.xlsx", "数据", ErpCustomerRespVO.class,
                         BeanUtils.toBean(list, ErpCustomerRespVO.class));
     }
 

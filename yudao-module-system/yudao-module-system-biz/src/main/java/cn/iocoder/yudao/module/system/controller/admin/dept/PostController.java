@@ -99,7 +99,7 @@ public class PostController {
         reqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<PostDO> list = postService.getPostPage(reqVO).getList();
         // 输出
-        ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostRespVO.class,
+        ExcelUtils.write(response, "岗位数据.xlsx", "岗位列表", PostRespVO.class,
                 BeanUtils.toBean(list, PostRespVO.class));
     }
 

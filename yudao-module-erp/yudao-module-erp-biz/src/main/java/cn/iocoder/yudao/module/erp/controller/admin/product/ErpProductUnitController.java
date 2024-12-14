@@ -95,7 +95,7 @@ public class ErpProductUnitController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpProductUnitDO> list = productUnitService.getProductUnitPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "产品单位.xls", "数据", ErpProductUnitRespVO.class,
+        ExcelUtils.write(response, "产品单位.xlsx", "数据", ErpProductUnitRespVO.class,
                         BeanUtils.toBean(list, ErpProductUnitRespVO.class));
     }
 

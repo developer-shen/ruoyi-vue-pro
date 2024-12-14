@@ -83,7 +83,7 @@ public class Demo02CategoryController {
               HttpServletResponse response) throws IOException {
         List<Demo02CategoryDO> list = demo02CategoryService.getDemo02CategoryList(listReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "示例分类.xls", "数据", Demo02CategoryRespVO.class,
+        ExcelUtils.write(response, "示例分类.xlsx", "数据", Demo02CategoryRespVO.class,
                         BeanUtils.toBean(list, Demo02CategoryRespVO.class));
     }
 

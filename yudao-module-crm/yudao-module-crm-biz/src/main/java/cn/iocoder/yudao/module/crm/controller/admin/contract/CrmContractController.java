@@ -159,7 +159,7 @@ public class CrmContractController {
                                     HttpServletResponse response) throws IOException {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
-        ExcelUtils.write(response, "合同.xls", "数据", CrmContractRespVO.class,
+        ExcelUtils.write(response, "合同.xlsx", "数据", CrmContractRespVO.class,
                 BeanUtils.toBean(pageResult.getList(), CrmContractRespVO.class));
     }
 

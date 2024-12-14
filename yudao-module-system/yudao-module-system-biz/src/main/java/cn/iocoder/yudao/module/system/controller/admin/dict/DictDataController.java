@@ -97,7 +97,7 @@ public class DictDataController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<DictDataDO> list = dictDataService.getDictDataPage(exportReqVO).getList();
         // 输出
-        ExcelUtils.write(response, "字典数据.xls", "数据", DictDataRespVO.class,
+        ExcelUtils.write(response, "字典数据.xlsx", "数据", DictDataRespVO.class,
                 BeanUtils.toBean(list, DictDataRespVO.class));
     }
 

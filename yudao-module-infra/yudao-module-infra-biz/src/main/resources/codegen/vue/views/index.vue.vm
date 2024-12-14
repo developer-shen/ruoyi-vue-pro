@@ -307,7 +307,7 @@ export default {
       try {
         this.exportLoading = true;
         const data = await ${simpleClassName}Api.export${simpleClassName}Excel(this.queryParams);
-        this.#[[$]]#download.excel(data, '${table.classComment}.xls');
+        this.#[[$]]#download.excel(data, '${table.classComment}.xlsx');
       } catch {
       } finally {
         this.exportLoading = false;

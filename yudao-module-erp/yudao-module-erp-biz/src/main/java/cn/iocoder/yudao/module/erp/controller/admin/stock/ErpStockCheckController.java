@@ -119,7 +119,7 @@ public class ErpStockCheckController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpStockCheckRespVO> list = buildStockCheckVOPageResult(stockCheckService.getStockCheckPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "库存调拨单.xls", "数据", ErpStockCheckRespVO.class, list);
+        ExcelUtils.write(response, "库存调拨单.xlsx", "数据", ErpStockCheckRespVO.class, list);
     }
 
     private PageResult<ErpStockCheckRespVO> buildStockCheckVOPageResult(PageResult<ErpStockCheckDO> pageResult) {

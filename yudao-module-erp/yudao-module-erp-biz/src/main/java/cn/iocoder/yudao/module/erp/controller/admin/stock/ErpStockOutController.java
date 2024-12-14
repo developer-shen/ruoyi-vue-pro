@@ -131,7 +131,7 @@ public class ErpStockOutController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpStockOutRespVO> list = buildStockOutVOPageResult(stockOutService.getStockOutPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "其它出库单.xls", "数据", ErpStockOutRespVO.class, list);
+        ExcelUtils.write(response, "其它出库单.xlsx", "数据", ErpStockOutRespVO.class, list);
     }
 
     private PageResult<ErpStockOutRespVO> buildStockOutVOPageResult(PageResult<ErpStockOutDO> pageResult) {

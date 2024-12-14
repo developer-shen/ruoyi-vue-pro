@@ -338,7 +338,7 @@ const handleExport = async () => {
     // 发起导出
     exportLoading.value = true
     const data = await ${simpleClassName}Api.export${simpleClassName}(queryParams)
-    download.excel(data, '${table.classComment}.xls')
+    download.excel(data, '${table.classComment}.xlsx')
   } catch {
   } finally {
     exportLoading.value = false

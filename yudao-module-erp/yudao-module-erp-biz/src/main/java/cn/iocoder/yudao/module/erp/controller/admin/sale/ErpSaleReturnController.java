@@ -131,7 +131,7 @@ public class ErpSaleReturnController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSaleReturnRespVO> list = buildSaleReturnVOPageResult(saleReturnService.getSaleReturnPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "销售退货.xls", "数据", ErpSaleReturnRespVO.class, list);
+        ExcelUtils.write(response, "销售退货.xlsx", "数据", ErpSaleReturnRespVO.class, list);
     }
 
     private PageResult<ErpSaleReturnRespVO> buildSaleReturnVOPageResult(PageResult<ErpSaleReturnDO> pageResult) {

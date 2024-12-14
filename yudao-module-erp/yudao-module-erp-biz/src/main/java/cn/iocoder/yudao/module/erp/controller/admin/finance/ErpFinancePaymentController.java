@@ -120,7 +120,7 @@ public class ErpFinancePaymentController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpFinancePaymentRespVO> list = buildFinancePaymentVOPageResult(financePaymentService.getFinancePaymentPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "付款单.xls", "数据", ErpFinancePaymentRespVO.class, list);
+        ExcelUtils.write(response, "付款单.xlsx", "数据", ErpFinancePaymentRespVO.class, list);
     }
 
     private PageResult<ErpFinancePaymentRespVO> buildFinancePaymentVOPageResult(PageResult<ErpFinancePaymentDO> pageResult) {

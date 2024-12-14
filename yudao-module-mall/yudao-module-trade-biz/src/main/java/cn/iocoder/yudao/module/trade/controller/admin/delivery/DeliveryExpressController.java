@@ -91,6 +91,6 @@ public class DeliveryExpressController {
         List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressList(exportReqVO);
         // 导出 Excel
         List<DeliveryExpressExcelVO> dataList = DeliveryExpressConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "快递公司.xls", "数据", DeliveryExpressExcelVO.class, dataList);
+        ExcelUtils.write(response, "快递公司.xlsx", "数据", DeliveryExpressExcelVO.class, dataList);
     }
 }

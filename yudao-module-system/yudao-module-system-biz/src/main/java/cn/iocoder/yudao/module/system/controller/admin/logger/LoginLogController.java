@@ -52,7 +52,7 @@ public class LoginLogController {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<LoginLogDO> list = loginLogService.getLoginLogPage(exportReqVO).getList();
         // 输出
-        ExcelUtils.write(response, "登录日志.xls", "数据列表", LoginLogRespVO.class,
+        ExcelUtils.write(response, "登录日志.xlsx", "数据列表", LoginLogRespVO.class,
                 BeanUtils.toBean(list, LoginLogRespVO.class));
     }
 
