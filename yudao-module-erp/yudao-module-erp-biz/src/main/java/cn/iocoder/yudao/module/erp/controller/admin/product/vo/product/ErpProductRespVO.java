@@ -65,4 +65,8 @@ public class ErpProductRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @ExcelProperty("附件地址")
+    private String fileUrl;
+
 }

@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.product;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -82,5 +84,9 @@ public class ErpProductDO extends BaseDO {
      * 最低价格，单位：元
      */
     private BigDecimal minPrice;
+    /**
+     * 附件地址
+     */
+    private String fileUrl;
 
 }

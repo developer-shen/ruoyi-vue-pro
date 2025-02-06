@@ -52,4 +52,7 @@ public class ProductSaveReqVO {
     @Schema(description = "最低价格，单位：元", example = "161.87")
     private BigDecimal minPrice;
 
+    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    private String fileUrl;
+
 }
