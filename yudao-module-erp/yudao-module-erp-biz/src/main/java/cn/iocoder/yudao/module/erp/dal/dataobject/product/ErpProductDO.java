@@ -88,5 +88,9 @@ public class ErpProductDO extends BaseDO {
      * 附件地址
      */
     private String fileUrl;
+    /**
+     * spu商品货号
+     */
+    private String spuCode;
 
 }
