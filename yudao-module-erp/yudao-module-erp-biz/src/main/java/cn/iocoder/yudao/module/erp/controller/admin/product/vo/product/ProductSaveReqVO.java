@@ -55,6 +55,4 @@ public class ProductSaveReqVO {
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     private String fileUrl;
 
-    @Schema(description = "spu商品货号", example = "A01")
-    private String spuCode;
 }

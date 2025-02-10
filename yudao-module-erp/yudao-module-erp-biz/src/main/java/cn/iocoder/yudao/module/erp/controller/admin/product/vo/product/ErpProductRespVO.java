@@ -68,8 +68,4 @@ public class ErpProductRespVO {
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     @ExcelProperty("附件地址")
     private String fileUrl;
-
-    @Schema(description = "spu商品货号", example = "A01")
-    @ExcelProperty("spu商品货号")
-    private String spuCode;
 }

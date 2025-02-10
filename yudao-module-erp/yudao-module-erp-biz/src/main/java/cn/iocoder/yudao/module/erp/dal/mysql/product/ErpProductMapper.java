@@ -19,8 +19,8 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
     default PageResult<ErpProductDO> selectPage(ErpProductPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpProductDO>()
-                .likeIfPresent(ErpProductDO::getSpuCode, reqVO.getSpuCode())
                 .likeIfPresent(ErpProductDO::getName, reqVO.getName())
+                .likeIfPresent(ErpProductDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(ErpProductDO::getCategoryId, reqVO.getCategoryId())
                 .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ErpProductDO::getId));

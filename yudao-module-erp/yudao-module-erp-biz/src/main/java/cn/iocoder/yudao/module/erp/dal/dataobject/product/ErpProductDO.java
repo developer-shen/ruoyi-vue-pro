@@ -35,7 +35,7 @@ public class ErpProductDO extends BaseDO {
      */
     private String name;
     /**
-     * 产品条码
+     * 产品条码-spu货号
      */
     private String barCode;
     /**
@@ -88,9 +88,5 @@ public class ErpProductDO extends BaseDO {
      * 附件地址
      */
     private String fileUrl;
-    /**
-     * spu商品货号
-     */
-    private String spuCode;
 
 }

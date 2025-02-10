@@ -14,11 +14,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpProductPageReqVO extends PageParam {
 
-    @Schema(description = "spu货号", example = "A01")
-    private String spuCode;
-
-    @Schema(description = "skc货号", example = "A01-RED")
+    @Schema(description = "产品名称", example = "李四")
     private String name;
+
+    @Schema(description = "spu货号", example = "A01")
+    private String barCode;
 
     @Schema(description = "产品分类编号", example = "11161")
     private Long categoryId;
