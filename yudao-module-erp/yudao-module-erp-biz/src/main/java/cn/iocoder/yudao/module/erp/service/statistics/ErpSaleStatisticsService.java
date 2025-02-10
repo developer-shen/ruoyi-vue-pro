@@ -41,11 +41,11 @@ public interface ErpSaleStatisticsService {
     List<ErpSaleTimeSummaryRespVO> getSaleMoneySummary(Integer count);
 
     /**
-     * 获得skc销售量统计
+     * 获得spu销售量统计
      * @param count 日期范围
      * @param customerId 平台客户
      * @return
      */
-    List<ErpSaleTimeSummaryRespVO> getSaleSkcNumSummaryOfCustomer(Integer count, Long customerId);
+    List<ErpSaleTimeSummaryRespVO> getSaleSpuNumSummaryOfCustomer(Integer count, Long customerId);
 
 }

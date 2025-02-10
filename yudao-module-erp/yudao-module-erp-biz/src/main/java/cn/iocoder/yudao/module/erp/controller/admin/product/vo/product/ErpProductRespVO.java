@@ -16,11 +16,11 @@ public class ErpProductRespVO {
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15672")
     private Long id;
 
-    @Schema(description = "skc货号", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
-    @ExcelProperty("skc货号")
+    @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
+    @ExcelProperty("产品名称")
     private String name;
 
-    @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
+    @Schema(description = "spu货号", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
     private String barCode;
 
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11161")

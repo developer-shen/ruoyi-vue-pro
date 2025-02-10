@@ -150,14 +150,14 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
 
 
     /**
-     * 获得skc销售量统计
+     * 获得spu销售量统计
      *
      * @param count      日期范围
      * @param customerId 平台客户
      * @return
      */
     @Override
-    public List<ErpSaleTimeSummaryRespVO> getSaleSkcNumSummaryOfCustomer(Integer count, Long customerId) {
+    public List<ErpSaleTimeSummaryRespVO> getSaleSpuNumSummaryOfCustomer(Integer count, Long customerId) {
         List<ErpSaleTimeSummaryRespVO> summaryList = new ArrayList<>();
 
         // 获取全部产品信息
@@ -195,7 +195,7 @@ public class ErpSaleStatisticsServiceImpl implements ErpSaleStatisticsService {
                 // 产品订单数量
                 int saleNum = CollectionUtils.isEmpty(saleOrderItemList) ? 0 : saleOrderItemList.stream().mapToInt(e -> e.getCount().intValue()).sum();
 
-                dataMap.put(productVO.getName(), saleNum);
+                dataMap.put(productVO.getBarCode(), saleNum);
             }
             erpSaleTimeSummaryRespVO.setData(dataMap);
             summaryList.add(erpSaleTimeSummaryRespVO);
