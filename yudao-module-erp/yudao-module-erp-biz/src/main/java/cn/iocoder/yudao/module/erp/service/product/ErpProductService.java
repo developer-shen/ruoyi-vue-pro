@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 
 /**
  * ERP 产品 Service 接口
@@ -107,5 +107,52 @@ public interface ErpProductService {
      * @return 产品数量
      */
     Long getProductCountByUnitId(Long unitId);
+
+    /**
+     * 创建产品变种skc
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createProductSkc(@Valid ProductSkcSaveReqVO createReqVO);
+
+    /**
+     * 更新产品变种skc
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateProductSkc(@Valid ProductSkcSaveReqVO updateReqVO);
+
+    /**
+     * 删除产品变种skc
+     *
+     * @param id 编号
+     */
+    void deleteProductSkc(Long id);
+
+    /**
+     * 获得产品
+     *
+     * @param id 编号
+     * @return 产品
+     */
+    ErpProductSkcDO getProductSkc(Long id);
+
+    /**
+     * 根据产品id查询变种skc列表
+     * @param productIds 产品id集合
+     * @return 变种skc列表
+     */
+    List<ErpProductSkcRespVO> getProductSkcListByProductIds(Collection<Long> productIds);
+
+    /**
+     * 获得产品变种skc VO Map
+     *
+     * @param productIds 编号数组
+     * @return 产品变种skc VO Map
+     */
+    default Map<Long, List<ErpProductSkcRespVO>> getProductSkcVOMap(Collection<Long> productIds) {
+        return convertMultiMap(getProductSkcListByProductIds(productIds), ErpProductSkcRespVO::getProductId);
+    }
 
 }

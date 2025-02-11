@@ -5,13 +5,13 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductSkcMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -24,8 +24,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
  * ERP 产品 Service 实现类
@@ -38,6 +37,8 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Resource
     private ErpProductMapper productMapper;
+    @Resource
+    private ErpProductSkcMapper productSkcMapper;
 
     @Resource
     private ErpProductCategoryService productCategoryService;
@@ -151,4 +152,51 @@ public class ErpProductServiceImpl implements ErpProductService {
         return productMapper.selectCountByUnitId(unitId);
     }
 
+    @Override
+    public Long createProductSkc(ProductSkcSaveReqVO createReqVO) {
+        // 插入
+        ErpProductSkcDO productSkc = BeanUtils.toBean(createReqVO, ErpProductSkcDO.class);
+        productSkcMapper.insert(productSkc);
+        // 返回
+        return productSkc.getId();
+    }
+
+    @Override
+    public void updateProductSkc(ProductSkcSaveReqVO updateReqVO) {
+        // 校验存在
+        validateProductSkcExists(updateReqVO.getId());
+        // 更新
+        ErpProductSkcDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductSkcDO.class);
+        productSkcMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteProductSkc(Long id) {
+        // 校验存在
+        validateProductSkcExists(id);
+        // 删除
+        productSkcMapper.deleteById(id);
+    }
+
+    @Override
+    public ErpProductSkcDO getProductSkc(Long id) {
+        return productSkcMapper.selectById(id);
+    }
+
+    @Override
+    public List<ErpProductSkcRespVO> getProductSkcListByProductIds(Collection<Long> productIds) {
+        List<ErpProductSkcDO> list = productSkcMapper.selectProductSkcListByProductIds(productIds);
+
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        return BeanUtils.toBean(list, ErpProductSkcRespVO.class);
+    }
+
+    private void validateProductSkcExists(Long id) {
+        if (productSkcMapper.selectById(id) == null) {
+            throw exception(PRODUCT_SKC_NOT_EXISTS);
+        }
+    }
 }

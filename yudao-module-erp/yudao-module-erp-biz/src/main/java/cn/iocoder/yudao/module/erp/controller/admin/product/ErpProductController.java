@@ -1,17 +1,23 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,10 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - ERP 产品")
 @RestController
@@ -75,7 +83,8 @@ public class ErpProductController {
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
-        return success(productService.getProductVOPage(pageReqVO));
+        PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
+        return success(buildProductVOPageResult(pageResult));
     }
 
     @GetMapping("/simple-list")
@@ -100,6 +109,61 @@ public class ErpProductController {
         // 导出 Excel
         ExcelUtils.write(response, "产品.xlsx", "数据", ErpProductRespVO.class,
                 pageResult.getList());
+    }
+
+    @PostMapping("/createSkc")
+    @Operation(summary = "创建产品skc变种")
+    @PreAuthorize("@ss.hasPermission('erp:product:create')")
+    public CommonResult<Long> createProductSkc(@Valid @RequestBody ProductSkcSaveReqVO createReqVO) {
+        return success(productService.createProductSkc(createReqVO));
+    }
+
+    @PutMapping("/updateSkc")
+    @Operation(summary = "更新产品变种Skc")
+    @PreAuthorize("@ss.hasPermission('erp:product:update')")
+    public CommonResult<Boolean> updateProductSkc(@Valid @RequestBody ProductSkcSaveReqVO updateReqVO) {
+        productService.updateProductSkc(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/deleteSkc")
+    @Operation(summary = "删除产品变种Skc")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:product:delete')")
+    public CommonResult<Boolean> deleteProductSkc(@RequestParam("id") Long id) {
+        productService.deleteProductSkc(id);
+        return success(true);
+    }
+
+    @GetMapping("/getSkc")
+    @Operation(summary = "获得产品变种skc")
+    @Parameter(name = "id", description = "skc编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('erp:product:query')")
+    public CommonResult<ErpProductSkcRespVO> getProductSkc(@RequestParam("id") Long id) {
+        ErpProductSkcDO productSkc = productService.getProductSkc(id);
+        return success(BeanUtils.toBean(productSkc, ErpProductSkcRespVO.class));
+    }
+
+    private PageResult<ErpProductRespVO> buildProductVOPageResult(PageResult<ErpProductRespVO> pageResult) {
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return PageResult.empty(pageResult.getTotal());
+        }
+        // 1.1 产品变种SKC信息
+        Map<Long, List<ErpProductSkcRespVO>> productSkcVOMap = productService.getProductSkcVOMap(
+                convertSet(pageResult.getList(), ErpProductRespVO::getId));
+
+        // 2. 开始拼接
+        pageResult.getList().forEach(productVO -> {
+            // 各产品的skc列表
+            List<ErpProductSkcRespVO> productSkcList = productSkcVOMap.get(productVO.getId());
+
+            productVO.setItems(
+                BeanUtils.toBean( productSkcList, ErpProductRespVO.Item.class)
+            );
+            productVO.setSkcCodes( CollUtil.join(productSkcList, "，", ErpProductSkcRespVO::getBarCode) );
+        });
+
+        return pageResult;
     }
 
 }
