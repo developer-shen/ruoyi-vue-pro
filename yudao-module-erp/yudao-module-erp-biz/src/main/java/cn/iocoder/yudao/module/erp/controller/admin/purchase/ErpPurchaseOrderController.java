@@ -155,7 +155,7 @@ public class ErpPurchaseOrderController {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderRespVO.Item.class,
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
-            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductName));
+            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductBarCode));
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreatorName(user.getNickname()));
         });

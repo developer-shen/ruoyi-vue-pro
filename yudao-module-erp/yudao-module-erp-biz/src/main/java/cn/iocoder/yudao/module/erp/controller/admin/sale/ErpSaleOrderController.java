@@ -155,7 +155,7 @@ public class ErpSaleOrderController {
             saleOrder.setItems(BeanUtils.toBean(saleOrderItemMap.get(saleOrder.getId()), ErpSaleOrderRespVO.Item.class,
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
-            saleOrder.setProductNames(CollUtil.join(saleOrder.getItems(), "，", ErpSaleOrderRespVO.Item::getProductName));
+            saleOrder.setProductNames(CollUtil.join(saleOrder.getItems(), "，", ErpSaleOrderRespVO.Item::getProductBarCode));
             MapUtils.findAndThen(customerMap, saleOrder.getCustomerId(), supplier -> saleOrder.setCustomerName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(saleOrder.getCreator()), user -> saleOrder.setCreatorName(user.getNickname()));
         });
