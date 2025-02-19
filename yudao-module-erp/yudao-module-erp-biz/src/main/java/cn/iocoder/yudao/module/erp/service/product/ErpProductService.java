@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
+import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.ProductProfitSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 
@@ -155,4 +156,18 @@ public interface ErpProductService {
         return convertMultiMap(getProductSkcListByProductIds(productIds), ErpProductSkcRespVO::getProductId);
     }
 
+    /**
+     * 创建产品利润
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createProductProfit(@Valid ProductProfitSaveReqVO createReqVO);
+
+    /**
+     * 更新产品利润
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateProductProfit(@Valid ProductProfitSaveReqVO updateReqVO);
 }

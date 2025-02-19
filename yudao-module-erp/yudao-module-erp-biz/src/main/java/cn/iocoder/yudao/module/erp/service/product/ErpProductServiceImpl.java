@@ -6,12 +6,15 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
+import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.ProductProfitSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductSkcMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.productprofit.ProductProfitMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -39,7 +42,8 @@ public class ErpProductServiceImpl implements ErpProductService {
     private ErpProductMapper productMapper;
     @Resource
     private ErpProductSkcMapper productSkcMapper;
-
+    @Resource
+    private ProductProfitMapper productProfitMapper;
     @Resource
     private ErpProductCategoryService productCategoryService;
     @Resource
@@ -197,6 +201,30 @@ public class ErpProductServiceImpl implements ErpProductService {
     private void validateProductSkcExists(Long id) {
         if (productSkcMapper.selectById(id) == null) {
             throw exception(PRODUCT_SKC_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public Long createProductProfit(ProductProfitSaveReqVO createReqVO) {
+        // 插入
+        ProductProfitDO productProfit = BeanUtils.toBean(createReqVO, ProductProfitDO.class);
+        productProfitMapper.insert(productProfit);
+        // 返回
+        return productProfit.getId();
+    }
+
+    @Override
+    public void updateProductProfit(ProductProfitSaveReqVO updateReqVO) {
+        // 校验存在
+        validateProductProfitExists(updateReqVO.getId());
+        // 更新
+        ProductProfitDO updateObj = BeanUtils.toBean(updateReqVO, ProductProfitDO.class);
+        productProfitMapper.updateById(updateObj);
+    }
+
+    private void validateProductProfitExists(Long id) {
+        if (productProfitMapper.selectById(id) == null) {
+            throw exception(PRODUCT_PROFIT_NOT_EXISTS);
         }
     }
 }

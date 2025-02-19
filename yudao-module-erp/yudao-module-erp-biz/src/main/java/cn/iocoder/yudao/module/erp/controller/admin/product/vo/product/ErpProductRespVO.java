@@ -77,6 +77,13 @@ public class ErpProductRespVO {
     @ExcelProperty("skc信息")
     private String skcCodes;
 
+    @Schema(description = "利润编号", example = "1")
+    private Long profitId;
+
+    @Schema(description = "预估利润", example = "10.30")
+    @ExcelProperty("预估利润")
+    private BigDecimal estimatedProfit;
+
     @Data
     public static class Item {
 
