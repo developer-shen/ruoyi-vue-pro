@@ -69,7 +69,7 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer stock;
     /**
-     * 商品重量，单位：kg 千克
+     * 商品重量，单位：g 克
      */
     private Double weight;
     /**

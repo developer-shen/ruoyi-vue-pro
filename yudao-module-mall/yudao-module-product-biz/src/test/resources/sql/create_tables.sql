@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `product_sku` (
     `bar_code` varchar(64)  DEFAULT NULL COMMENT 'SKU 的条形码',
     `pic_url` varchar(256)  NOT NULL COMMENT '图片地址',
     `stock` int DEFAULT NULL COMMENT '库存',
-    `weight` double DEFAULT NULL COMMENT '商品重量，单位：kg 千克',
+    `weight` double DEFAULT NULL COMMENT '商品重量，单位：g 克',
     `volume` double DEFAULT NULL COMMENT '商品体积，单位：m^3 平米',
     `sub_commission_first_price` int DEFAULT NULL COMMENT '一级分销的佣金，单位：分',
     `sub_commission_second_price` int DEFAULT NULL COMMENT '二级分销的佣金，单位：分',

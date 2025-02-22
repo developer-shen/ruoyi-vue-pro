@@ -6,26 +6,24 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.ProductProfitRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.ProductProfitSaveReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductAttributesRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductAttributesSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.productattributes.ProductAttributesDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.productprofit.ProductProfitService;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.erp.service.product.ProductAttributesService;
+import cn.iocoder.yudao.module.erp.service.product.ProductProfitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +32,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,6 +52,9 @@ public class ErpProductController {
 
     @Resource
     private ProductProfitService productProfitService;
+
+    @Resource
+    private ProductAttributesService productAttributesService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -178,6 +178,38 @@ public class ErpProductController {
         return success(true);
     }
 
+    @PostMapping("/createAttr")
+    @Operation(summary = "创建产品属性")
+    @PreAuthorize("@ss.hasPermission('erp:product:create')")
+    public CommonResult<Long> createProductAttr(@Valid @RequestBody ProductAttributesSaveReqVO createReqVO) {
+        return success(productAttributesService.createProductAttributes(createReqVO));
+    }
+
+    @PutMapping("/updateAttr")
+    @Operation(summary = "更新产品属性")
+    @PreAuthorize("@ss.hasPermission('erp:product:update')")
+    public CommonResult<Boolean> updateProductAttr(@Valid @RequestBody ProductAttributesSaveReqVO updateReqVO) {
+        productAttributesService.updateProductAttributes(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/deleteAttr")
+    @Operation(summary = "删除产品属性")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:product:delete')")
+    public CommonResult<Boolean> deleteProductAttr(@RequestParam("id") Long id) {
+        productAttributesService.deleteProductAttributes(id);
+        return success(true);
+    }
+
+    @GetMapping("/getAttr")
+    @Operation(summary = "获得产品属性")
+    @Parameter(name = "id", description = "属性编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('erp:product:query')")
+    public CommonResult<ProductAttributesRespVO> getProductAttr(@RequestParam("id") Long id) {
+        ProductAttributesDO productAttr = productAttributesService.getProductAttributes(id);
+        return success(BeanUtils.toBean(productAttr, ProductAttributesRespVO.class));
+    }
 
     private PageResult<ErpProductRespVO> buildProductVOPageResult(PageResult<ErpProductRespVO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -188,22 +220,36 @@ public class ErpProductController {
                 convertSet(pageResult.getList(), ErpProductRespVO::getId));
         // 1.2 产品利润信息
         List<ProductProfitDO> profitListByProductIdList = productProfitService.getProfitListByProductIds(convertSet(pageResult.getList(), ErpProductRespVO::getId));
+        // 1.3 产品属性信息
+        List<ProductAttributesDO> attributesListByProductIdList = productAttributesService.getProductAttributesByProductIds(convertSet(pageResult.getList(), ErpProductRespVO::getId));
 
         // 2. 开始拼接
         pageResult.getList().forEach(productVO -> {
             // 各产品的skc列表
             List<ErpProductSkcRespVO> productSkcList = productSkcVOMap.get(productVO.getId());
-            // 拼接skc信息
+            // 2.1 拼接skc信息
             productVO.setItems(
-                BeanUtils.toBean( productSkcList, ErpProductRespVO.Item.class)
+                BeanUtils.toBean( productSkcList, ErpProductSkcRespVO.class)
             );
             productVO.setSkcCodes( CollUtil.join(productSkcList, "，", ErpProductSkcRespVO::getBarCode) );
-            // 填充预估利润信息
+            // 2.2填充预估利润信息
             List<ProductProfitDO> estimatedProfitList = profitListByProductIdList.stream().filter(profit -> profit.getProductId().equals(productVO.getId())).collect(Collectors.toList());
-           if (estimatedProfitList != null && estimatedProfitList.size() > 0){
+            if (estimatedProfitList != null && estimatedProfitList.size() > 0){
                productVO.setProfitId(estimatedProfitList.get(0).getId());
                productVO.setEstimatedProfit(estimatedProfitList.get(0).getProfit());
-           }
+            }
+            // 2.3 填充产品属性信息
+            List<ProductAttributesDO> attributesList = attributesListByProductIdList.stream().filter(attributes -> attributes.getProductId().equals(productVO.getId())).collect(Collectors.toList());
+            if (attributesList != null && attributesList.size() > 0){
+                productVO.setAttributesId(attributesList.get(0).getId());
+                if (
+                        attributesList.get(0).getWeight() != null// 重量
+                        && StringUtils.isNotEmpty(attributesList.get(0).getProductMeasurements())// 产品尺码表
+                ){// 供应商提供了重量和尺码表时记录
+                    productVO.setFullAttr(true);
+                }
+            }
+
         });
 
         return pageResult;

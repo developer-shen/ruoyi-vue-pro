@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo;
+package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import lombok.*;
 import java.util.*;

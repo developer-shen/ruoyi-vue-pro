@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.ProductProfitSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 
@@ -132,7 +132,7 @@ public interface ErpProductService {
     void deleteProductSkc(Long id);
 
     /**
-     * 获得产品
+     * 获得产品skc
      *
      * @param id 编号
      * @return 产品

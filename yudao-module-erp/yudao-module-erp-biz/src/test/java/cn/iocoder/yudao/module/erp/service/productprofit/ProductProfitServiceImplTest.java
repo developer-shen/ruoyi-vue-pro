@@ -1,32 +1,27 @@
 package cn.iocoder.yudao.module.erp.service.productprofit;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
+import cn.iocoder.yudao.module.erp.service.product.ProductProfitServiceImpl;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.productprofit.ProductProfitMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.product.ProductProfitMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link ProductProfitServiceImpl} 的单元测试类

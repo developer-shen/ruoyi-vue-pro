@@ -38,7 +38,7 @@ public class ProductSkuSaveReqVO {
     @NotNull(message = "库存不能为空")
     private Integer stock;
 
-    @Schema(description = "商品重量,单位：kg 千克", example = "1.2")
+    @Schema(description = "商品重量,单位：g 克", example = "1.2")
     private Double weight;
 
     @Schema(description = "商品体积,单位：m^3 平米", example = "2.5")

@@ -89,7 +89,7 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer stock;
 
-        @Schema(description = "商品重量", example = "1") // 单位：kg 千克
+        @Schema(description = "商品重量", example = "1") // 单位：g 克
         private Double weight;
 
         @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米

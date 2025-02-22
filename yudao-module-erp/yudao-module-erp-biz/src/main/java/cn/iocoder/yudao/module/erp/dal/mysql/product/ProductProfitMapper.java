@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.erp.dal.mysql.productprofit;
+package cn.iocoder.yudao.module.erp.dal.mysql.product;
 
 import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.*;
 
 /**
  * ERP 产品利润 Mapper

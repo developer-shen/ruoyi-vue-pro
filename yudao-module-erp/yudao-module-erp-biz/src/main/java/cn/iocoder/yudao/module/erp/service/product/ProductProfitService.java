@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.module.erp.service.productprofit;
+package cn.iocoder.yudao.module.erp.service.product;
 
 import java.util.*;
 import javax.validation.*;
 
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.*;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 

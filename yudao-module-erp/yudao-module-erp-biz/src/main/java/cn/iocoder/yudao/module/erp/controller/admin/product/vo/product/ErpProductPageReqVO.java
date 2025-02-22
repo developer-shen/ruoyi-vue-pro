@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -20,8 +21,9 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "spu货号", example = "A01")
     private String barCode;
 
-    @Schema(description = "产品分类编号", example = "11161")
-    private Long categoryId;
+    @Schema(description = "产品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("产品状态")
+    private Integer status;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

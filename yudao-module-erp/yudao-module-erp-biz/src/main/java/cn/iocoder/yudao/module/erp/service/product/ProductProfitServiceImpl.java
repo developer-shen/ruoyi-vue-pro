@@ -1,19 +1,22 @@
-package cn.iocoder.yudao.module.erp.service.productprofit;
+package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import cn.iocoder.yudao.module.erp.controller.admin.productprofit.vo.*;
+
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.erp.dal.mysql.productprofit.ProductProfitMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.product.ProductProfitMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_PROFIT_NOT_EXISTS;
 
 /**
  * ERP 产品利润 Service 实现类
@@ -55,7 +58,7 @@ public class ProductProfitServiceImpl implements ProductProfitService {
 
     private void validateProductProfitExists(Long id) {
         if (productProfitMapper.selectById(id) == null) {
-            throw exception(null);
+            throw exception(PRODUCT_PROFIT_NOT_EXISTS);
         }
     }
 
