@@ -10,6 +10,10 @@ import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 /**
  * 文件工具类
@@ -79,6 +83,23 @@ public class FileUtils {
         }
         // 情况二：基于 content 计算
         return sha256Hex + '.' + FileTypeUtil.getType(new ByteArrayInputStream(content));
+    }
+
+    public static <T> String readFileOfResourcePath(Class<T> clazz, String path){
+        try (InputStream inputStream = clazz.getClassLoader().getResourceAsStream(path)) {
+            // 如果文件不存在，抛出异常
+            if (inputStream == null) {
+                throw new IOException("文件不存在!");
+            }
+            // 使用 Scanner 读取文件内容，并将其转换为字符串
+            try (Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name())) {
+                String result = scanner.useDelimiter("\\A").next();// "\\A" 表示扫描整个输入流
+                return result;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

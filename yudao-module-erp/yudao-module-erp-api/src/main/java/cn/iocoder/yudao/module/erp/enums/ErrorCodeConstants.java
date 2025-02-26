@@ -133,6 +133,8 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     ErrorCode PRODUCT_SKC_NOT_EXISTS = new ErrorCode(1_030_500_002, "产品skc不存在");
     ErrorCode PRODUCT_PROFIT_NOT_EXISTS = new ErrorCode(1_030_500_003, "产品利润不存在");
     ErrorCode PRODUCT_ATTRIBUTES_NOT_EXISTS = new ErrorCode(1_030_500_004, "产品属性不存在");
+    ErrorCode PRODUCT_BARCODE_EXISTS = new ErrorCode(1_030_500_005, "产品SPU货号已存在");
+
 
     // ========== ERP 产品分类 1-030-501-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_030_501_000, "产品分类不存在");

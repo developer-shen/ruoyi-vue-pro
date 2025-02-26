@@ -196,3 +196,24 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+
+jeecg : # 积木报表图片上传路径
+  # local|minio|alioss
+  uploadType: minio
+  # local
+  path :
+    #文件路径
+    upload: /www/wwwroot/fashionview
+  # alioss
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    accessKey: ??
+    secretKey: ??
+    bucketName: jeecgos
+    staticDomain: ??
+  # minio
+  minio:
+    minio_url: 127.0.0.1:19000
+    minio_name: fashionviewdev
+    minio_pass: devshen123456
+    bucketName: fashionviewbucket

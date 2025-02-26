@@ -221,7 +221,7 @@ public class ErpProductController {
         // 1.2 产品利润信息
         List<ProductProfitDO> profitListByProductIdList = productProfitService.getProfitListByProductIds(convertSet(pageResult.getList(), ErpProductRespVO::getId));
         // 1.3 产品属性信息
-        List<ProductAttributesDO> attributesListByProductIdList = productAttributesService.getProductAttributesByProductIds(convertSet(pageResult.getList(), ErpProductRespVO::getId));
+//        List<ProductAttributesDO> attributesListByProductIdList = productAttributesService.getProductAttributesByProductIds(convertSet(pageResult.getList(), ErpProductRespVO::getId));
 
         // 2. 开始拼接
         pageResult.getList().forEach(productVO -> {
@@ -239,16 +239,10 @@ public class ErpProductController {
                productVO.setEstimatedProfit(estimatedProfitList.get(0).getProfit());
             }
             // 2.3 填充产品属性信息
-            List<ProductAttributesDO> attributesList = attributesListByProductIdList.stream().filter(attributes -> attributes.getProductId().equals(productVO.getId())).collect(Collectors.toList());
-            if (attributesList != null && attributesList.size() > 0){
-                productVO.setAttributesId(attributesList.get(0).getId());
-                if (
-                        attributesList.get(0).getWeight() != null// 重量
-                        && StringUtils.isNotEmpty(attributesList.get(0).getProductMeasurements())// 产品尺码表
-                ){// 供应商提供了重量和尺码表时记录
-                    productVO.setFullAttr(true);
-                }
-            }
+//            List<ProductAttributesDO> attributesList = attributesListByProductIdList.stream().filter(attributes -> attributes.getProductId().equals(productVO.getId())).collect(Collectors.toList());
+//            if (attributesList != null && attributesList.size() > 0){
+//                productVO.setAttributesId(attributesList.get(0).getId());
+//            }
 
         });
 

@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.erp.service.product;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.io.FileUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.*;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductProfitSaveReqVO;
@@ -12,14 +14,19 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductSkcMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ProductProfitMapper;
+import cn.iocoder.yudao.module.report.controller.admin.report.vo.ReportSaveReqVO;
+import cn.iocoder.yudao.module.report.service.report.ReportService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -45,13 +52,36 @@ public class ErpProductServiceImpl implements ErpProductService {
     private ErpProductCategoryService productCategoryService;
     @Resource
     private ErpProductUnitService productUnitService;
+    @Resource
+    private ReportService reportService;
 
     @Override
+    @Transactional
     public Long createProduct(ProductSaveReqVO createReqVO) {
-        // TODO 芋艿：校验分类
+        // 校验货号是否已经存在
+        validateProductBarCodeExists(createReqVO.getBarCode());
         // 插入
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         productMapper.insert(product);
+
+        // 新建商品尺码模板
+        // 使用类加载器获取 resource下模板文件 的内容
+        String templatePath = "template/ProductSize.json";
+        String fileStr = FileUtils.readFileOfResourcePath(ErpProductServiceImpl.class, templatePath);
+        String jsonStr = fileStr.replace("{{barCode}}", createReqVO.getBarCode());
+
+        // 获取文件的路径（URL 转为路径）
+        ReportSaveReqVO reportSaveReqVO = new ReportSaveReqVO();
+        reportSaveReqVO.setId(createReqVO.getBarCode());
+        reportSaveReqVO.setCode(createReqVO.getBarCode());
+        reportSaveReqVO.setName(createReqVO.getBarCode() + "尺码表");
+        reportSaveReqVO.setType("datainfo");// 数据报表
+        reportSaveReqVO.setJsonStr(jsonStr);
+        reportSaveReqVO.setCreateBy("sys");
+        reportSaveReqVO.setDelFlag(false);
+        reportSaveReqVO.setTemplate(false);
+        reportService.createReport(reportSaveReqVO);
+
         // 返回
         return product.getId();
     }
@@ -96,6 +126,13 @@ public class ErpProductServiceImpl implements ErpProductService {
     private void validateProductExists(Long id) {
         if (productMapper.selectById(id) == null) {
             throw exception(PRODUCT_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductBarCodeExists(String barCode) {
+        List<ErpProductDO> list = productMapper.selectListByBarCode(barCode);
+        if ( list != null && !list.isEmpty()) {
+            throw exception(PRODUCT_BARCODE_EXISTS);
         }
     }
 

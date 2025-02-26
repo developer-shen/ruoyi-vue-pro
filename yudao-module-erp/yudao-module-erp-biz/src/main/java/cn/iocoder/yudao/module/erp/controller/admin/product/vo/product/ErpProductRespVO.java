@@ -87,6 +87,4 @@ public class ErpProductRespVO {
     @Schema(description = "属性编号", example = "1")
     private Long attributesId;
 
-    @Schema(description = "属性是否完备")
-    private Boolean fullAttr = false;
 }

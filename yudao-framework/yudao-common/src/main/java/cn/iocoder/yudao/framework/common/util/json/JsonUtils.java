@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -191,6 +192,17 @@ public class JsonUtils {
             return objectMapper.readTree(text);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String readJsonFile(String filePath) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // 读取文件内容并转化为字符串
+            return objectMapper.readTree(new File(filePath)).toString();
+        } catch (IOException e) {
+            log.error("json parse err,exception:{}", e);
             throw new RuntimeException(e);
         }
     }
