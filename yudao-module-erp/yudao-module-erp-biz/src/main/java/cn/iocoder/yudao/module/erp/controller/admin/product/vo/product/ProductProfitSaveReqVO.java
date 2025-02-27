@@ -45,6 +45,10 @@ public class ProductProfitSaveReqVO {
     @NotNull(message = "退货运费不能为空")
     private BigDecimal refundFreight;
 
+    @Schema(description = "广告费用", example = "14237")
+    @NotNull(message = "广告费用不能为空")
+    private BigDecimal adPrice;
+
     @Schema(description = "其他费用", example = "14237")
     @NotNull(message = "其他费用不能为空")
     private BigDecimal otherPrice;

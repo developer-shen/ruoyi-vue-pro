@@ -27,6 +27,7 @@ public interface ProductProfitMapper extends BaseMapperX<ProductProfitDO> {
                 .eqIfPresent(ProductProfitDO::getLastMilePrice, reqVO.getLastMilePrice())
                 .eqIfPresent(ProductProfitDO::getRefundRate, reqVO.getRefundRate())
                 .eqIfPresent(ProductProfitDO::getRefundFreight, reqVO.getRefundFreight())
+                .eqIfPresent(ProductProfitDO::getAdPrice, reqVO.getAdPrice())
                 .eqIfPresent(ProductProfitDO::getOtherPrice, reqVO.getOtherPrice())
                 .eqIfPresent(ProductProfitDO::getOtherDetail, reqVO.getOtherDetail())
                 .betweenIfPresent(ProductProfitDO::getCreateTime, reqVO.getCreateTime())

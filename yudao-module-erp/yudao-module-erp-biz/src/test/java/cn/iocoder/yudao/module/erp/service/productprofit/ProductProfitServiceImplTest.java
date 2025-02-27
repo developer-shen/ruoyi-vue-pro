@@ -113,6 +113,7 @@ public class ProductProfitServiceImplTest extends BaseDbUnitTest {
            o.setLastMilePrice(null);
            o.setRefundRate(null);
            o.setRefundFreight(null);
+           o.setAdPrice(null);
            o.setOtherPrice(null);
            o.setOtherDetail(null);
            o.setCreateTime(null);

@@ -68,6 +68,10 @@ public class ProductProfitDO extends BaseDO {
      */
     private BigDecimal refundFreight;
     /**
+     * 广告费用
+     */
+    private BigDecimal adPrice;
+    /**
      * 其他费用
      */
     private BigDecimal otherPrice;

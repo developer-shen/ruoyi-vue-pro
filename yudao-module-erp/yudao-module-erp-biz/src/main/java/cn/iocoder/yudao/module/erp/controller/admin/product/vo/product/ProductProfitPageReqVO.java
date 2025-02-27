@@ -40,6 +40,9 @@ public class ProductProfitPageReqVO extends PageParam {
     @Schema(description = "退货运费")
     private BigDecimal refundFreight;
 
+    @Schema(description = "广告费用", example = "14237")
+    private BigDecimal adPrice;
+
     @Schema(description = "其他费用", example = "14237")
     private BigDecimal otherPrice;
 

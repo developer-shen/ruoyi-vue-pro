@@ -49,6 +49,10 @@ public class ProductProfitRespVO {
     @ExcelProperty("退货运费")
     private BigDecimal refundFreight;
 
+    @Schema(description = "广告费用", example = "14237")
+    @ExcelProperty("广告费用")
+    private BigDecimal adPrice;
+
     @Schema(description = "其他费用", example = "14237")
     @ExcelProperty("其他费用")
     private BigDecimal otherPrice;
