@@ -55,8 +55,10 @@ public class ErpFinancePaymentListServiceImpl implements ErpFinancePaymentListSe
         financePaymentListMapper.deleteById(id);
     }
 
-    private void validateFinancePaymentListExists(Long id) {
-        if (financePaymentListMapper.selectById(id) == null) {
+    @Override
+    public void validateFinancePaymentListExists(Long id) {
+        ErpFinancePaymentListDO erpFinancePaymentListDO = financePaymentListMapper.selectById(id);
+        if ( erpFinancePaymentListDO == null || erpFinancePaymentListDO.getDeleted()) {
             throw exception(FINANCE_PAYMENT_LIST_NOT_EXISTS);
         }
     }

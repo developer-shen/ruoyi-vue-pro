@@ -16,6 +16,9 @@ public class ErpFinancePaymentRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
     private Long id;
 
+    @Schema(description = "付款清单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
+    private Long paymentListId;
+
     @Schema(description = "付款单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "FKD888")
     private String no;
 

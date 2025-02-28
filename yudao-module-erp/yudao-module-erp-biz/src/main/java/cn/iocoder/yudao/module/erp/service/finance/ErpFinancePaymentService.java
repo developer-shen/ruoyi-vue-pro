@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentItemD
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ERP 付款单 Service 接口
@@ -80,5 +81,13 @@ public interface ErpFinancePaymentService {
      * @return 付款单项 List
      */
     List<ErpFinancePaymentItemDO> getFinancePaymentItemListByPaymentIds(Collection<Long> paymentIds);
+
+    /**
+     * 获得付款单统计
+     *
+     * @param
+     * @return 付款单统计
+     */
+    Map<String, Object> getPaymentStatistic(ErpFinancePaymentPageReqVO pageReqVO);
 
 }

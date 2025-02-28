@@ -98,9 +98,7 @@ public class ErpFinancePaymentController {
         if (payment == null) {
             return success(null);
         }
-        List<ErpFinancePaymentItemDO> paymentItemList = financePaymentService.getFinancePaymentItemListByPaymentId(id);
-        return success(BeanUtils.toBean(payment, ErpFinancePaymentRespVO.class, financePaymentVO ->
-                financePaymentVO.setItems(BeanUtils.toBean(paymentItemList, ErpFinancePaymentRespVO.Item.class))));
+        return success(BeanUtils.toBean(payment, ErpFinancePaymentRespVO.class));
     }
 
     @GetMapping("/page")
@@ -121,6 +119,15 @@ public class ErpFinancePaymentController {
         List<ErpFinancePaymentRespVO> list = buildFinancePaymentVOPageResult(financePaymentService.getFinancePaymentPage(pageReqVO)).getList();
         // 导出 Excel
         ExcelUtils.write(response, "付款单.xlsx", "数据", ErpFinancePaymentRespVO.class, list);
+    }
+
+    @GetMapping("/getStatistic")
+    @Operation(summary = "查询付款单统计")
+    @PreAuthorize("@ss.hasPermission('erp:finance-payment:query')")
+    public CommonResult<Map<String,Object>> getStatistic(@Valid ErpFinancePaymentPageReqVO pageReqVO) {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        Map<String,Object> resultMap = financePaymentService.getPaymentStatistic(pageReqVO);
+        return success(resultMap);
     }
 
     private PageResult<ErpFinancePaymentRespVO> buildFinancePaymentVOPageResult(PageResult<ErpFinancePaymentDO> pageResult) {

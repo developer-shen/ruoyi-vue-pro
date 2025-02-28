@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -30,6 +31,10 @@ public class ErpFinancePaymentDO extends BaseDO {
      */
     @TableId
     private Long id;
+    /**
+     * 付款清单编号
+     */
+    private Long paymentListId;
     /**
      * 付款单号
      */

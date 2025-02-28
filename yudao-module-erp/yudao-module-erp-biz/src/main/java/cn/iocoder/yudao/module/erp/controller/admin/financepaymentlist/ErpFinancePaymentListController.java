@@ -36,6 +36,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -44,6 +45,7 @@ import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.FINANCE_PAYMENT_LIST_NOT_EXISTS;
 
 import cn.iocoder.yudao.module.erp.controller.admin.financepaymentlist.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.financepaymentlist.ErpFinancePaymentListDO;
@@ -90,6 +92,9 @@ public class ErpFinancePaymentListController {
     @PreAuthorize("@ss.hasPermission('erp:finance-payment-list:query')")
     public CommonResult<ErpFinancePaymentListRespVO> getFinancePaymentList(@RequestParam("id") Long id) {
         ErpFinancePaymentListDO financePaymentList = financePaymentListService.getFinancePaymentList(id);
+        if ( financePaymentList == null || financePaymentList.getDeleted()) {
+            throw exception(FINANCE_PAYMENT_LIST_NOT_EXISTS);
+        }
         return success(BeanUtils.toBean(financePaymentList, ErpFinancePaymentListRespVO.class));
     }
 

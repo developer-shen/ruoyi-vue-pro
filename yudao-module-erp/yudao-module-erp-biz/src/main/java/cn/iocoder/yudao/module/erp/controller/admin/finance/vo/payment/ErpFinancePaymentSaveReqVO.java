@@ -17,6 +17,10 @@ public class ErpFinancePaymentSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
     private Long id;
 
+    @Schema(description = "付款清单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
+    @NotNull(message = "付款编号不能为空")
+    private Long paymentListId;
+
     @Schema(description = "付款时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "付款时间不能为空")
     private LocalDateTime paymentTime;
@@ -33,15 +37,15 @@ public class ErpFinancePaymentSaveReqVO {
     private Long accountId;
 
     @Schema(description = "优惠金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "11600")
-    @NotNull(message = "优惠金额不能为空")
     private BigDecimal discountPrice;
+
+    @Schema(description = "实付金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "11600")
+    private BigDecimal paymentPrice;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
 
     @Schema(description = "付款项列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "付款项列表不能为空")
-    @Valid
     private List<Item> items;
 
     @Data

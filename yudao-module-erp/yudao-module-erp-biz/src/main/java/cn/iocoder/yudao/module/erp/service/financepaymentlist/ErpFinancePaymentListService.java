@@ -15,6 +15,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 public interface ErpFinancePaymentListService {
 
     /**
+     * 校验付款清单是否存在
+     *
+     * @param id 编号
+     */
+     void validateFinancePaymentListExists(Long id);
+
+    /**
      * 创建ERP 付款清单
      *
      * @param createReqVO 创建信息

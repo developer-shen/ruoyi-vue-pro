@@ -3,21 +3,26 @@ package cn.iocoder.yudao.module.erp.service.finance;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment.ErpFinancePaymentPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment.ErpFinancePaymentSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinancePaymentItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinancePaymentMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.common.ErpBizTypeEnum;
+import cn.iocoder.yudao.module.erp.service.financepaymentlist.ErpFinancePaymentListService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseReturnService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -27,9 +32,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -65,24 +68,26 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private ErpFinancePaymentListService financePaymentListService;
+
+    @Resource
+    private ErpPurchaseOrderService purchaseOrderService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createFinancePayment(ErpFinancePaymentSaveReqVO createReqVO) {
-        // 1.1 校验订单项的有效性
-        List<ErpFinancePaymentItemDO> paymentItems = validateFinancePaymentItems(
-                createReqVO.getSupplierId(), createReqVO.getItems());
-        // 1.2 校验供应商
+        // 1.1 校验供应商
         supplierService.validateSupplier(createReqVO.getSupplierId());
-        // 1.3 校验结算账户
+        // 1.2 校验结算账户
         if (createReqVO.getAccountId() != null) {
             accountService.validateAccount(createReqVO.getAccountId());
         }
-        // 1.4 校验财务人员
-        if (createReqVO.getFinanceUserId() != null) {
-            adminUserApi.validateUser(createReqVO.getFinanceUserId());
+        // 1.3 校验付款清单编号有效性
+        if (createReqVO.getPaymentListId() != null) {
+            financePaymentListService.validateFinancePaymentListExists(createReqVO.getPaymentListId());
         }
-        // 1.5 生成付款单号，并校验唯一性
+        // 1.4 生成付款单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_PAYMENT_NO_PREFIX);
         if (financePaymentMapper.selectByNo(no) != null) {
             throw exception(FINANCE_PAYMENT_NO_EXISTS);
@@ -91,14 +96,8 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         // 2.1 插入付款单
         ErpFinancePaymentDO payment = BeanUtils.toBean(createReqVO, ErpFinancePaymentDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
-        calculateTotalPrice(payment, paymentItems);
         financePaymentMapper.insert(payment);
-        // 2.2 插入付款单项
-        paymentItems.forEach(o -> o.setPaymentId(payment.getId()));
-        financePaymentItemMapper.insertBatch(paymentItems);
 
-        // 3. 更新采购入库、退货的付款金额情况
-        updatePurchasePrice(paymentItems);
         return payment.getId();
     }
 
@@ -116,20 +115,14 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         if (updateReqVO.getAccountId() != null) {
             accountService.validateAccount(updateReqVO.getAccountId());
         }
-        // 1.4 校验财务人员
-        if (updateReqVO.getFinanceUserId() != null) {
-            adminUserApi.validateUser(updateReqVO.getFinanceUserId());
+        // 1.4 校验付款清单编号有效性
+        if (updateReqVO.getPaymentListId() != null) {
+            financePaymentListService.validateFinancePaymentListExists(updateReqVO.getPaymentListId());
         }
-        // 1.5 校验付款单项的有效性
-        List<ErpFinancePaymentItemDO> paymentItems = validateFinancePaymentItems(
-                updateReqVO.getSupplierId(), updateReqVO.getItems());
 
         // 2.1 更新付款单
         ErpFinancePaymentDO updateObj = BeanUtils.toBean(updateReqVO, ErpFinancePaymentDO.class);
-        calculateTotalPrice(updateObj, paymentItems);
         financePaymentMapper.updateById(updateObj);
-        // 2.2 更新付款单项
-        updateFinancePaymentItemList(updateReqVO.getId(), paymentItems);
     }
 
     private void calculateTotalPrice(ErpFinancePaymentDO payment, List<ErpFinancePaymentItemDO> paymentItems) {
@@ -228,12 +221,6 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         payments.forEach(payment -> {
             // 2.1 删除付款单
             financePaymentMapper.deleteById(payment.getId());
-            // 2.2 删除付款单项
-            List<ErpFinancePaymentItemDO> paymentItems = financePaymentItemMapper.selectListByPaymentId(payment.getId());
-            financePaymentItemMapper.deleteBatchIds(convertSet(paymentItems, ErpFinancePaymentItemDO::getId));
-
-            // 2.3 更新采购入库、退货的付款金额情况
-            updatePurchasePrice(paymentItems);
         });
     }
 
@@ -268,6 +255,48 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             return Collections.emptyList();
         }
         return financePaymentItemMapper.selectListByPaymentIds(paymentIds);
+    }
+
+    @Override
+    public Map<String, Object> getPaymentStatistic(ErpFinancePaymentPageReqVO pageReqVO) {
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("totalPayment", 0);// 采购总金额
+        resultMap.put("amountPaid", 0);// 已结算金额
+        resultMap.put("unpaidAmount", 0);// 待结算金额
+        resultMap.put("percentage", 0);// 结算百分比
+
+        // 1. 统计采购总金额
+        ErpPurchaseOrderPageReqVO purchaseOrderPageReqVO = new ErpPurchaseOrderPageReqVO();
+        purchaseOrderPageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        purchaseOrderPageReqVO.setSupplierId(pageReqVO.getSupplierId());// 供应商编号
+        PageResult<ErpPurchaseOrderDO> purchaseOrderPageResult = purchaseOrderService.getPurchaseOrderPage(purchaseOrderPageReqVO);
+        BigDecimal totalPayment = purchaseOrderPageResult.getList()
+                .stream()
+                .filter(e -> !e.getDeleted())
+                .map(e -> e.getTotalPrice())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        resultMap.put("totalPayment", totalPayment);// 采购总金额
+
+        // 2. 统计付款单已结算金额
+        PageResult<ErpFinancePaymentDO> erpFinancePaymentDOPageResult = financePaymentMapper.selectPage(pageReqVO);
+        BigDecimal amountPaid = erpFinancePaymentDOPageResult.getList()
+                .stream()
+                .filter(e -> !e.getDeleted())
+                .map(ErpFinancePaymentDO::getPaymentPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        resultMap.put("amountPaid", amountPaid);// 已结算金额
+
+        // 3. 统计待结算金额
+        BigDecimal unpaidAmount = totalPayment.subtract(amountPaid);
+        resultMap.put("unpaidAmount", unpaidAmount);// 待结算金额
+        // 4. 结算百分比
+        if (totalPayment.compareTo(BigDecimal.ZERO) == 0) {
+            resultMap.put("percentage", 0);
+        } else {
+            resultMap.put("percentage", amountPaid.divide(totalPayment, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)));
+        }
+
+        return resultMap;
     }
 
 }
