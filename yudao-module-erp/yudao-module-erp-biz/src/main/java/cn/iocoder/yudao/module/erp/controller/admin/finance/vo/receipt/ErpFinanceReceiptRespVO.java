@@ -24,6 +24,8 @@ public class ErpFinanceReceiptRespVO {
 
     @Schema(description = "收款时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime receiptTime;
+    @Schema(description = "到账时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime receivedTime;
 
     @Schema(description = "财务人员编号", example = "19690")
     private Long financeUserId;
@@ -40,13 +42,13 @@ public class ErpFinanceReceiptRespVO {
     @Schema(description = "收款账户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String accountName;
 
-    @Schema(description = "合计价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "13832")
+    @Schema(description = "合计收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "13832")
     private BigDecimal totalPrice;
 
     @Schema(description = "优惠金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "11600")
     private BigDecimal discountPrice;
 
-    @Schema(description = "实际价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    @Schema(description = "实际到账，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
     private BigDecimal receiptPrice;
 
     @Schema(description = "备注", example = "你猜")

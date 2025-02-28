@@ -45,6 +45,10 @@ public class ErpFinanceReceiptDO extends BaseDO {
      */
     private LocalDateTime receiptTime;
     /**
+     * 到账时间
+     */
+    private LocalDateTime receivedTime;
+    /**
      * 财务人员编号
      *
      * 关联 AdminUserDO 的 id 字段
@@ -64,7 +68,7 @@ public class ErpFinanceReceiptDO extends BaseDO {
     private Long accountId;
 
     /**
-     * 合计价格，单位：元
+     * 合计收款，单位：元
      */
     private BigDecimal totalPrice;
     /**
@@ -72,7 +76,7 @@ public class ErpFinanceReceiptDO extends BaseDO {
      */
     private BigDecimal discountPrice;
     /**
-     * 实付金额，单位：分
+     * 实际到账，单位：元
      *
      * receiptPrice = totalPrice - discountPrice
      */

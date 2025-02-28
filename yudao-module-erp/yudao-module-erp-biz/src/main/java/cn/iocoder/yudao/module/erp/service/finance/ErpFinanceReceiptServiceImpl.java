@@ -69,36 +69,22 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createFinanceReceipt(ErpFinanceReceiptSaveReqVO createReqVO) {
-        // 1.1 校验订单项的有效性
-        List<ErpFinanceReceiptItemDO> receiptItems = validateFinanceReceiptItems(
-                createReqVO.getCustomerId(), createReqVO.getItems());
-        // 1.2 校验客户
+        // 1.1 校验收款平台
         customerService.validateCustomer(createReqVO.getCustomerId());
-        // 1.3 校验结算账户
+        // 1.2 校验结算账户
         if (createReqVO.getAccountId() != null) {
             accountService.validateAccount(createReqVO.getAccountId());
         }
-        // 1.4 校验财务人员
-        if (createReqVO.getFinanceUserId() != null) {
-            adminUserApi.validateUser(createReqVO.getFinanceUserId());
-        }
-        // 1.5 生成收款单号，并校验唯一性
+        // 1.3 生成收款单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_RECEIPT_NO_PREFIX);
         if (financeReceiptMapper.selectByNo(no) != null) {
             throw exception(FINANCE_RECEIPT_NO_EXISTS);
         }
-
         // 2.1 插入收款单
         ErpFinanceReceiptDO receipt = BeanUtils.toBean(createReqVO, ErpFinanceReceiptDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
-        calculateTotalPrice(receipt, receiptItems);
         financeReceiptMapper.insert(receipt);
-        // 2.2 插入收款单项
-        receiptItems.forEach(o -> o.setReceiptId(receipt.getId()));
-        financeReceiptItemMapper.insertBatch(receiptItems);
 
-        // 3. 更新销售出库、退货的收款金额情况
-        updateSalePrice(receiptItems);
         return receipt.getId();
     }
 
@@ -110,26 +96,15 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
         if (ErpAuditStatus.APPROVE.getStatus().equals(receipt.getStatus())) {
             throw exception(FINANCE_RECEIPT_UPDATE_FAIL_APPROVE, receipt.getNo());
         }
-        // 1.2 校验客户
+        // 1.2 校验收款平台
         customerService.validateCustomer(updateReqVO.getCustomerId());
         // 1.3 校验结算账户
         if (updateReqVO.getAccountId() != null) {
             accountService.validateAccount(updateReqVO.getAccountId());
         }
-        // 1.4 校验财务人员
-        if (updateReqVO.getFinanceUserId() != null) {
-            adminUserApi.validateUser(updateReqVO.getFinanceUserId());
-        }
-        // 1.5 校验收款单项的有效性
-        List<ErpFinanceReceiptItemDO> receiptItems = validateFinanceReceiptItems(
-                updateReqVO.getCustomerId(), updateReqVO.getItems());
-
         // 2.1 更新收款单
         ErpFinanceReceiptDO updateObj = BeanUtils.toBean(updateReqVO, ErpFinanceReceiptDO.class);
-        calculateTotalPrice(updateObj, receiptItems);
         financeReceiptMapper.updateById(updateObj);
-        // 2.2 更新收款单项
-        updateFinanceReceiptItemList(updateReqVO.getId(), receiptItems);
     }
 
     private void calculateTotalPrice(ErpFinanceReceiptDO receipt, List<ErpFinanceReceiptItemDO> receiptItems) {
@@ -228,12 +203,6 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
         receipts.forEach(receipt -> {
             // 2.1 删除收款单
             financeReceiptMapper.deleteById(receipt.getId());
-            // 2.2 删除收款单项
-            List<ErpFinanceReceiptItemDO> receiptItems = financeReceiptItemMapper.selectListByReceiptId(receipt.getId());
-            financeReceiptItemMapper.deleteBatchIds(convertSet(receiptItems, ErpFinanceReceiptItemDO::getId));
-
-            // 2.3 更新销售出库、退货的收款金额情况
-            updateSalePrice(receiptItems);
         });
     }
 

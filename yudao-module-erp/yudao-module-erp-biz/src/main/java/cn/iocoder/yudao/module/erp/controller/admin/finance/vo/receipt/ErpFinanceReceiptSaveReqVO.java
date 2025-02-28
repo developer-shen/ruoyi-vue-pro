@@ -21,27 +21,33 @@ public class ErpFinanceReceiptSaveReqVO {
     @NotNull(message = "收款时间不能为空")
     private LocalDateTime receiptTime;
 
+    @Schema(description = "到账时间")
+    private LocalDateTime receivedTime;
+
     @Schema(description = "财务人员编号", example = "19690")
     private Long financeUserId;
 
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29399")
-    @NotNull(message = "客户编号不能为空")
+    @Schema(description = "收款平台编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29399")
+    @NotNull(message = "收款平台编号不能为空")
     private Long customerId;
 
     @Schema(description = "收款账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "28989")
     @NotNull(message = "收款账户编号不能为空")
     private Long accountId;
 
-    @Schema(description = "优惠金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "11600")
-    @NotNull(message = "优惠金额不能为空")
+    @Schema(description = "合计收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "11600")
+    private BigDecimal totalPrice;
+
+    @Schema(description = "优惠金额，单位：元")
     private BigDecimal discountPrice;
+
+    @Schema(description = "实际到账，单位：元")
+    private BigDecimal receiptPrice;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
 
     @Schema(description = "收款项列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "收款项列表不能为空")
-    @Valid
     private List<Item> items;
 
     @Data

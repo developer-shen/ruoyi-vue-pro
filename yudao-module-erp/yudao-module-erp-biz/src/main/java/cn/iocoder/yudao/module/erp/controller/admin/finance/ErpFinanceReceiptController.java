@@ -98,9 +98,7 @@ public class ErpFinanceReceiptController {
         if (receipt == null) {
             return success(null);
         }
-        List<ErpFinanceReceiptItemDO> receiptItemList = financeReceiptService.getFinanceReceiptItemListByReceiptId(id);
-        return success(BeanUtils.toBean(receipt, ErpFinanceReceiptRespVO.class, financeReceiptVO ->
-                financeReceiptVO.setItems(BeanUtils.toBean(receiptItemList, ErpFinanceReceiptRespVO.Item.class))));
+        return success(BeanUtils.toBean(receipt, ErpFinanceReceiptRespVO.class));
     }
 
     @GetMapping("/page")
@@ -127,22 +125,17 @@ public class ErpFinanceReceiptController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1.1 收款项
-        List<ErpFinanceReceiptItemDO> receiptItemList = financeReceiptService.getFinanceReceiptItemListByReceiptIds(
-                convertSet(pageResult.getList(), ErpFinanceReceiptDO::getId));
-        Map<Long, List<ErpFinanceReceiptItemDO>> financeReceiptItemMap = convertMultiMap(receiptItemList, ErpFinanceReceiptItemDO::getReceiptId);
-        // 1.2 客户信息
+        // 1.1 收款平台信息
         Map<Long, ErpCustomerDO> customerMap = customerService.getCustomerMap(
                 convertSet(pageResult.getList(), ErpFinanceReceiptDO::getCustomerId));
-        // 1.3 结算账户信息
+        // 1.2 结算账户信息
         Map<Long, ErpAccountDO> accountMap = accountService.getAccountMap(
                 convertSet(pageResult.getList(), ErpFinanceReceiptDO::getAccountId));
-        // 1.4 管理员信息
+        // 1.3 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpFinanceReceiptRespVO.class, receipt -> {
-            receipt.setItems(BeanUtils.toBean(financeReceiptItemMap.get(receipt.getId()), ErpFinanceReceiptRespVO.Item.class));
             MapUtils.findAndThen(customerMap, receipt.getCustomerId(), customer -> receipt.setCustomerName(customer.getName()));
             MapUtils.findAndThen(accountMap, receipt.getAccountId(), account -> receipt.setAccountName(account.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(receipt.getCreator()), user -> receipt.setCreatorName(user.getNickname()));
