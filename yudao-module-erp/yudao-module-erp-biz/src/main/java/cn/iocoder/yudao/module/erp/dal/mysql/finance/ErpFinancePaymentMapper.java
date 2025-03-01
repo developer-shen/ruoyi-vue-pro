@@ -27,6 +27,7 @@ public interface ErpFinancePaymentMapper extends BaseMapperX<ErpFinancePaymentDO
                 .eqIfPresent(ErpFinancePaymentDO::getAccountId, reqVO.getAccountId())
                 .eqIfPresent(ErpFinancePaymentDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpFinancePaymentDO::getRemark, reqVO.getRemark())
+                .orderByDesc(ErpFinancePaymentDO::getPaymentTime)
                 .orderByDesc(ErpFinancePaymentDO::getId);
         if (reqVO.getBizNo() != null) {
             query.leftJoin(ErpFinancePaymentItemDO.class, ErpFinancePaymentItemDO::getPaymentId, ErpFinancePaymentDO::getId)

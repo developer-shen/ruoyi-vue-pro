@@ -27,6 +27,7 @@ public interface ErpFinanceReceiptMapper extends BaseMapperX<ErpFinanceReceiptDO
                 .eqIfPresent(ErpFinanceReceiptDO::getAccountId, reqVO.getAccountId())
                 .eqIfPresent(ErpFinanceReceiptDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpFinanceReceiptDO::getRemark, reqVO.getRemark())
+                .orderByDesc(ErpFinanceReceiptDO::getReceiptTime)
                 .orderByDesc(ErpFinanceReceiptDO::getId);
         if (reqVO.getBizNo() != null) {
             query.leftJoin(ErpFinanceReceiptItemDO.class, ErpFinanceReceiptItemDO::getReceiptId, ErpFinanceReceiptDO::getId)

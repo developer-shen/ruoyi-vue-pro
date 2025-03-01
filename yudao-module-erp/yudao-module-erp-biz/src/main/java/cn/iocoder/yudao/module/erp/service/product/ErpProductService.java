@@ -68,6 +68,13 @@ public interface ErpProductService {
     List<ErpProductRespVO> getProductVOListByStatus(Integer status);
 
     /**
+     * 获得所有的产品 VO 列表
+     *
+     * @return 产品 VO 列表
+     */
+    List<ErpProductRespVO> getProductVOList();
+
+    /**
      * 获得产品 VO 列表
      *
      * @param ids 编号数组
