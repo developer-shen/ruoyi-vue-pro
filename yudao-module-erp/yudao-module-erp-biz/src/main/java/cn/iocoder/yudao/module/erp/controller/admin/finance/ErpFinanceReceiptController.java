@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.receipt.ErpFinanceReceiptPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.receipt.ErpFinanceReceiptRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.receipt.ErpFinanceReceiptSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.financepaymentlist.vo.ErpFinancePaymentListRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinanceReceiptDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinanceReceiptItemDO;
@@ -25,6 +26,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +35,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
@@ -106,7 +113,9 @@ public class ErpFinanceReceiptController {
     @PreAuthorize("@ss.hasPermission('erp:finance-receipt:query')")
     public CommonResult<PageResult<ErpFinanceReceiptRespVO>> getFinanceReceiptPage(@Valid ErpFinanceReceiptPageReqVO pageReqVO) {
         PageResult<ErpFinanceReceiptDO> pageResult = financeReceiptService.getFinanceReceiptPage(pageReqVO);
-        return success(buildFinanceReceiptVOPageResult(pageResult));
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        PageResult<ErpFinanceReceiptDO> allData = financeReceiptService.getFinanceReceiptPage(pageReqVO);
+        return success(buildFinanceReceiptVOPageResult(pageResult, allData));
     }
 
     @GetMapping("/export-excel")
@@ -116,12 +125,12 @@ public class ErpFinanceReceiptController {
     public void exportFinanceReceiptExcel(@Valid ErpFinanceReceiptPageReqVO pageReqVO,
                                          HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpFinanceReceiptRespVO> list = buildFinanceReceiptVOPageResult(financeReceiptService.getFinanceReceiptPage(pageReqVO)).getList();
+        List<ErpFinanceReceiptRespVO> list = buildFinanceReceiptVOPageResult(financeReceiptService.getFinanceReceiptPage(pageReqVO), null).getList();
         // 导出 Excel
         ExcelUtils.write(response, "收款单.xlsx", "数据", ErpFinanceReceiptRespVO.class, list);
     }
 
-    private PageResult<ErpFinanceReceiptRespVO> buildFinanceReceiptVOPageResult(PageResult<ErpFinanceReceiptDO> pageResult) {
+    private PageResult<ErpFinanceReceiptRespVO> buildFinanceReceiptVOPageResult(PageResult<ErpFinanceReceiptDO> pageResult, PageResult<ErpFinanceReceiptDO> allData) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
@@ -135,12 +144,65 @@ public class ErpFinanceReceiptController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpFinanceReceiptRespVO.class, receipt -> {
+        PageResult<ErpFinanceReceiptRespVO> result = BeanUtils.toBean(pageResult, ErpFinanceReceiptRespVO.class, receipt -> {
             MapUtils.findAndThen(customerMap, receipt.getCustomerId(), customer -> receipt.setCustomerName(customer.getName()));
             MapUtils.findAndThen(accountMap, receipt.getAccountId(), account -> receipt.setAccountName(account.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(receipt.getCreator()), user -> receipt.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, receipt.getFinanceUserId(), user -> receipt.setFinanceUserName(user.getNickname()));
         });
+
+        // 3. 附加统计数据
+        Map<String, Object> sideMap = new HashMap<>();
+        if (allData!= null && !CollectionUtils.isEmpty(allData.getList())) {
+            // 3.1 收款平台信息（全部数据）
+            Map<Long, ErpCustomerDO> allCustomerMap = customerService.getCustomerMap(
+                    convertSet(allData.getList(), ErpFinanceReceiptDO::getCustomerId));
+            // 3.2. 开始拼接（全部数据）
+            PageResult<ErpFinanceReceiptRespVO> allDataVO = BeanUtils.toBean(allData, ErpFinanceReceiptRespVO.class, receipt -> {
+                MapUtils.findAndThen(allCustomerMap, receipt.getCustomerId(), customer -> receipt.setCustomerId(customer.getId()));
+                MapUtils.findAndThen(allCustomerMap, receipt.getCustomerId(), customer -> receipt.setCustomerName(customer.getName()));
+            });
+            // 3.3. 统计饼状图1：合计收款数据
+            List<Map<String, Object>> totalPricePieOptionsDataList = new ArrayList<>();
+            allDataVO.getList().stream().map(ErpFinanceReceiptRespVO::getCustomerName).distinct().collect(Collectors.toList()).forEach(e -> {
+                BigDecimal sumOfTotalPrice = allDataVO.getList()
+                        .stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getCustomerName()))
+                        .map(ErpFinanceReceiptRespVO::getTotalPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                Map<String, Object> statisticsMap = new HashMap<>();
+                statisticsMap.put("name", e + "");
+                statisticsMap.put("value", sumOfTotalPrice);
+
+                totalPricePieOptionsDataList.add(statisticsMap);
+            });
+
+            // 3.4. 饼状图2：实际到账数据
+            List<Map<String, Object>> receiptPricePieOptionsDataList = new ArrayList<>();
+            allDataVO.getList().stream().map(ErpFinanceReceiptRespVO::getCustomerName).distinct().collect(Collectors.toList()).forEach(e -> {
+                BigDecimal sumOfReceiptPrice = allDataVO.getList()
+                        .stream().filter(vo -> !StringUtils.isEmpty(e) && e.equals(vo.getCustomerName()))
+                        .map(ErpFinanceReceiptRespVO::getReceiptPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                Map<String, Object> statisticsMap = new HashMap<>();
+                statisticsMap.put("name", e + "");
+                statisticsMap.put("value", sumOfReceiptPrice);
+
+                receiptPricePieOptionsDataList.add(statisticsMap);
+            });
+
+            // finally
+            // 填充A:饼状图1：合计收款数据
+            sideMap.put("totalPricePieOptionsDataList", totalPricePieOptionsDataList);
+            // 填充A:饼状图2：实际到账数据
+            sideMap.put("receiptPricePieOptionsDataList", receiptPricePieOptionsDataList);
+        }
+        result.setSide(sideMap);
+        return result;
     }
+
 
 }
