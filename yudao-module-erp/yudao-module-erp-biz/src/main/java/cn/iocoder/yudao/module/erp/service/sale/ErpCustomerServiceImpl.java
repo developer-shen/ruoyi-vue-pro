@@ -85,6 +85,11 @@ public class ErpCustomerServiceImpl implements ErpCustomerService {
     }
 
     @Override
+    public List<ErpCustomerDO> getCustomerListByName(String name) {
+        return customerMapper.selectListByName(name);
+    }
+
+    @Override
     public PageResult<ErpCustomerDO> getCustomerPage(ErpCustomerPageReqVO pageReqVO) {
         return customerMapper.selectPage(pageReqVO);
     }

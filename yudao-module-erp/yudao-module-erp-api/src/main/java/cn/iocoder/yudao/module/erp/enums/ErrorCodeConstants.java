@@ -48,9 +48,9 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     ErrorCode PURCHASE_RETURN_FAIL_REFUND_PRICE_EXCEED = new ErrorCode(1_030_103_007, "退款金额({})超过采购退货单总金额({})");
     ErrorCode PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND = new ErrorCode(1_030_103_008, "反审核失败，已存在对应的退款单");
 
-    // ========== ERP 客户（1-030-200-000）==========
-    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_200_000, "客户不存在");
-    ErrorCode CUSTOMER_NOT_ENABLE = new ErrorCode(1_020_200_001, "客户({})未启用");
+    // ========== ERP 订单平台（1-030-200-000）==========
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_200_000, "订单平台不存在");
+    ErrorCode CUSTOMER_NOT_ENABLE = new ErrorCode(1_020_200_001, "订单平台({})未启用");
 
     // ========== ERP 销售订单（1-030-201-000） ==========
     ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_020_201_000, "销售订单不存在");
@@ -64,7 +64,8 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     ErrorCode SALE_ORDER_PROCESS_FAIL_EXISTS_OUT = new ErrorCode(1_020_201_008, "反审核失败，已存在对应的销售出库单");
     ErrorCode SALE_ORDER_ITEM_RETURN_FAIL_OUT_EXCEED = new ErrorCode(1_020_201_009, "销售订单项({})超过最大允许退货数量({})");
     ErrorCode SALE_ORDER_PROCESS_FAIL_EXISTS_RETURN = new ErrorCode(1_020_201_010, "反审核失败，已存在对应的销售退货单");
-
+    ErrorCode SALE_ORDER_IMPORT_LIST_IS_EMPTY = new ErrorCode(1_020_201_011, "导入销售订单数据不能为空！");
+    ErrorCode SALE_ORDER_IMPORT_LIST_ONLY_ONE_CUSTOMER = new ErrorCode(1_020_201_013, "一次只能导入一个收款平台的数据！");
     // ========== ERP 销售出库（1-030-202-000） ==========
     ErrorCode SALE_OUT_NOT_EXISTS = new ErrorCode(1_020_202_000, "销售出库单不存在");
     ErrorCode SALE_OUT_DELETE_FAIL_APPROVE = new ErrorCode(1_020_202_001, "销售出库单({})已审核，无法删除");
@@ -130,10 +131,11 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     // ========== ERP 产品 1-030-500-000 ==========
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_030_500_000, "产品不存在");
     ErrorCode PRODUCT_NOT_ENABLE = new ErrorCode(1_030_500_001, "产品({})未启用");
-    ErrorCode PRODUCT_SKC_NOT_EXISTS = new ErrorCode(1_030_500_002, "产品skc不存在");
-    ErrorCode PRODUCT_PROFIT_NOT_EXISTS = new ErrorCode(1_030_500_003, "产品利润不存在");
-    ErrorCode PRODUCT_ATTRIBUTES_NOT_EXISTS = new ErrorCode(1_030_500_004, "产品属性不存在");
-    ErrorCode PRODUCT_BARCODE_EXISTS = new ErrorCode(1_030_500_005, "产品SPU货号已存在");
+    ErrorCode PRODUCT_SPU_NOT_EXISTS = new ErrorCode(1_030_500_002, "产品SPU货号不存在");
+    ErrorCode PRODUCT_SKC_NOT_EXISTS = new ErrorCode(1_030_500_003, "产品SKC货号不存在");
+    ErrorCode PRODUCT_PROFIT_NOT_EXISTS = new ErrorCode(1_030_500_004, "产品利润不存在");
+    ErrorCode PRODUCT_ATTRIBUTES_NOT_EXISTS = new ErrorCode(1_030_500_005, "产品属性不存在");
+    ErrorCode PRODUCT_BARCODE_EXISTS = new ErrorCode(1_030_500_006, "产品SPU货号已存在");
 
 
     // ========== ERP 产品分类 1-030-501-000 ==========

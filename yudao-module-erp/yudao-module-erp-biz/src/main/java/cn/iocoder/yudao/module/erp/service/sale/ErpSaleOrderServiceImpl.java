@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.erp.service.sale;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderImportExcelVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpCustomerDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderItemMapper;
@@ -17,20 +20,23 @@ import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IMPORT_LIST_IS_EMPTY;
+import static java.util.stream.Collectors.groupingBy;
 
 // TODO 芋艿：记录操作日志
 
@@ -302,6 +308,99 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             return Collections.emptyList();
         }
         return saleOrderItemMapper.selectListByOrderIds(orderIds);
+    }
+
+    @Override
+    public String importSaleOrderList(List<ErpSaleOrderImportExcelVO> importSaleOrderList) {
+        String result = "导入失败";
+        List<ErpSaleOrderSaveReqVO> saleOrderSaveReqVOList= new ArrayList<>();
+
+        // 1 参数校验
+        // 1.1 不能为空列表
+        if (CollUtil.isEmpty(importSaleOrderList)) {
+            throw exception(SALE_ORDER_IMPORT_LIST_IS_EMPTY);
+        }
+        // 1.2 单元格内不能有空数据
+        if (importSaleOrderList.stream()
+                .filter(e-> StringUtils.isBlank(e.getCustomerName())
+                        || e.getOrderTime() == null
+                        || e.getProductCount() == null
+                        || StringUtils.isBlank(e.getProductBarCode()))
+                .count() > 0) {
+            throw exception(SALE_ORDER_IMPORT_LIST_IS_EMPTY);
+        }
+        // 1.3 一次只能导入一个收款平台的数据
+        if (importSaleOrderList.stream().map(ErpSaleOrderImportExcelVO::getCustomerName).distinct().count() > 1) {
+            throw exception(SALE_ORDER_IMPORT_LIST_ONLY_ONE_CUSTOMER);
+        }
+        // 1.4 收款平台必须存在
+        String customerName = importSaleOrderList.get(0).getCustomerName();
+        Long erpCustomerId;
+        List<ErpCustomerDO> customerList = customerService.getCustomerListByName(customerName);
+        if (CollUtil.isEmpty(customerList)) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        } else {
+            erpCustomerId = customerList.get(0).getId();
+        }
+        // 1.5 产品必须存在
+        List<ErpProductDO> allProductList = productService.getProductBySpuBarCodeSet(convertSet(importSaleOrderList, ErpSaleOrderImportExcelVO::getProductBarCode));
+        if( CollUtil.isEmpty(allProductList)
+                || convertSet(allProductList, ErpProductDO::getBarCode).size() !=  convertSet(importSaleOrderList, ErpSaleOrderImportExcelVO::getProductBarCode).size()){
+            throw exception(PRODUCT_SPU_NOT_EXISTS);
+        }
+
+        // 2 组装数据
+        // 按【订单时间】分组
+        Map<LocalDate, List<ErpSaleOrderImportExcelVO>> orderTimeMap = importSaleOrderList.stream()
+                .collect(groupingBy(ErpSaleOrderImportExcelVO::getOrderTime));
+        int totalDays = orderTimeMap.keySet().size();
+
+        // 按订单时间遍历订单
+        orderTimeMap.keySet().forEach(orderTime -> {
+            List<ErpSaleOrderImportExcelVO> excelVOList = orderTimeMap.get(orderTime);
+            // 2.1 组装数据库保存对象:ErpSaleOrder
+            ErpSaleOrderSaveReqVO createReqVO = new ErpSaleOrderSaveReqVO();
+            List<ErpSaleOrderSaveReqVO.Item> items = new ArrayList<>();
+            createReqVO.setCustomerId(erpCustomerId);// 订单平台编号
+            createReqVO.setOrderTime(orderTime.atStartOfDay());// 订单时间
+            createReqVO.setItems(items);
+
+            // 遍历商品
+            excelVOList.forEach(excelVO -> {
+                ErpProductDO productDO = allProductList.stream().filter(e-> e.getBarCode().equals(excelVO.getProductBarCode())).findFirst().get();
+                // 2.2 组装数据库保存对象:ErpSaleOrderItem
+                ErpSaleOrderSaveReqVO.Item item = new ErpSaleOrderSaveReqVO.Item();
+                item.setProductId(productDO.getId());// 产品编号
+                item.setProductPrice(productDO.getSalePrice());// 产品单价
+                item.setCount(BigDecimal.valueOf(excelVO.getProductCount()));// 产品数量
+
+                if(items.stream().filter(e-> e.getProductId().equals(productDO.getId())).count() > 0 ){
+                    // 重复商品，数量相加
+                    ErpSaleOrderSaveReqVO.Item existingItem = items.stream().filter(e -> e.getProductId().equals(productDO.getId())).findFirst().get();
+                    existingItem.setCount(existingItem.getCount().add(item.getCount()));
+                }else if (excelVO.getProductCount()>0){
+                    // 首次遍历到的商品，且数量大于0
+                    items.add(item);
+                }
+            });
+            saleOrderSaveReqVOList.add(createReqVO);
+        });
+
+        // 3 保存数据
+        StringBuilder emptyItemDay = new StringBuilder();
+        for (ErpSaleOrderSaveReqVO createReqVO : saleOrderSaveReqVOList) {
+            if(CollectionUtil.isEmpty(createReqVO.getItems())){
+                emptyItemDay.append(createReqVO.getOrderTime().toLocalDate().toString()).append(",");
+                continue;
+            }
+            createSaleOrder(createReqVO);
+        }
+
+        result = "导入完成，共上传【"+customerName+"】订单平台【"+totalDays+"】天订单数据。";
+        if(StringUtils.isNotBlank(emptyItemDay.toString())){
+            result += "其中【"+emptyItemDay.substring(0,emptyItemDay.length()-1)+"】无商品数据，已忽略。";
+        }
+        return result;
     }
 
 }

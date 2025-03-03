@@ -15,8 +15,8 @@ public class ErpSaleOrderSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     private Long id;
 
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
-    @NotNull(message = "客户编号不能为空")
+    @Schema(description = "订单平台编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
+    @NotNull(message = "订单平台编号不能为空")
     private Long customerId;
 
     @Schema(description = "下单时间", requiredMode = Schema.RequiredMode.REQUIRED)

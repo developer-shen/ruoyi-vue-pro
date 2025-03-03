@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.erp.controller.admin.sale;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -9,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderImportExcelVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderSaveReqVO;
@@ -21,22 +24,30 @@ import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOrderService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -131,6 +142,35 @@ public class ErpSaleOrderController {
         List<ErpSaleOrderRespVO> list = buildSaleOrderVOPageResult(saleOrderService.getSaleOrderPage(pageReqVO)).getList();
         // 导出 Excel
         ExcelUtils.write(response, "销售订单.xlsx", "数据", ErpSaleOrderRespVO.class, list);
+    }
+
+    @PostMapping("/import-excel")
+    @Operation(summary = "导入销售订单 Excel")
+    @Parameters({
+            @Parameter(name = "file", description = "Excel 文件", required = true),
+            @Parameter(name = "updateSupport", description = "是否支持更新，默认为 false", example = "true")
+    })
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:import')")
+    public CommonResult<String> importSaleOrderExcel(@RequestParam("file") MultipartFile file,
+                                                     @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport){
+        try {
+            List<ErpSaleOrderImportExcelVO> list = ExcelUtils.read(file, ErpSaleOrderImportExcelVO.class);
+            return success(saleOrderService.importSaleOrderList(list));
+        } catch (Exception e) {
+            return error(new ErrorCode(500,"导入失败！请检查数据格式"));
+        }
+    }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入销售订单模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 demo
+        List<ErpSaleOrderImportExcelVO> list = Arrays.asList(
+                ErpSaleOrderImportExcelVO.builder().customerName("tiktok").orderTime(LocalDate.now()).productCount(10).productBarCode("701").build(),
+                ErpSaleOrderImportExcelVO.builder().customerName("tiktok").orderTime(LocalDate.now()).productCount(20).productBarCode("702").build()
+        );
+        // 输出
+        ExcelUtils.write(response, "销售订单导入模板.xlsx", "销售订单列表", ErpSaleOrderImportExcelVO.class, list);
     }
 
     private PageResult<ErpSaleOrderRespVO> buildSaleOrderVOPageResult(PageResult<ErpSaleOrderDO> pageResult) {

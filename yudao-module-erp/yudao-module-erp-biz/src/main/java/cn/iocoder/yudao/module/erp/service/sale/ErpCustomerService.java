@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -64,6 +65,14 @@ public interface ErpCustomerService {
      * @return 客户列表
      */
     List<ErpCustomerDO> getCustomerList(Collection<Long> ids);
+
+    /**
+     * 通过名称获得订单平台列表
+     *
+     * @param name 项目
+     * @return 客户列表
+     */
+    List<ErpCustomerDO> getCustomerListByName(String name);
 
     /**
      * 获得客户 Map

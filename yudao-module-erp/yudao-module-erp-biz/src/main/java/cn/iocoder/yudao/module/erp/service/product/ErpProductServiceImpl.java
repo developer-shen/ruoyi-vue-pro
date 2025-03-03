@@ -142,6 +142,11 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
+    public List<ErpProductDO> getProductBySpuBarCodeSet(Set<String> barCodeSet) {
+        return productMapper.getProductBySpuBarCodeSet(barCodeSet);
+    }
+
+    @Override
     public List<ErpProductRespVO> getProductVOListByStatus(Integer status) {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);

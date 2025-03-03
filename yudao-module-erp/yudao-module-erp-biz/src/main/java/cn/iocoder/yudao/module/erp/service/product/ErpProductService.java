@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
@@ -58,6 +59,14 @@ public interface ErpProductService {
      * @return 产品
      */
     ErpProductDO getProduct(Long id);
+
+    /**
+     * 通过spu货号获得产品
+     *
+     * @param barCodeSet spu货号
+     * @return 产品
+     */
+    List<ErpProductDO> getProductBySpuBarCodeSet(Set<String> barCodeSet);
 
     /**
      * 获得指定状态的产品 VO 列表
