@@ -120,7 +120,7 @@ public class ErpSaleOrderController {
                     BigDecimal stockCount = stockService.getStockCount(item.getProductId());
                     item.setStockCount(stockCount != null ? stockCount : BigDecimal.ZERO);
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
+                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()).setFileUrl(product.getFileUrl()));
                 }))));
     }
 

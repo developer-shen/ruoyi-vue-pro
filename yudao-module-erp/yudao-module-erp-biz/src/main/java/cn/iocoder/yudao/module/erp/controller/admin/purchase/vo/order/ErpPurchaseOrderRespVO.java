@@ -147,6 +147,8 @@ public class ErpPurchaseOrderRespVO {
         @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
+        @Schema(description = "附件地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "www.baidu.com")
+        private String fileUrl; // 该字段仅仅在“详情”和“编辑”时使用
     }
 
 }
