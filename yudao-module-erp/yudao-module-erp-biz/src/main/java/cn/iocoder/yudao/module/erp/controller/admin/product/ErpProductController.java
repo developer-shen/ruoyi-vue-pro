@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,7 +87,14 @@ public class ErpProductController {
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
         ErpProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, ErpProductRespVO.class));
+        return success(BeanUtils.toBean(product, ErpProductRespVO.class,
+                productVO -> productVO.setCustomerIdList(
+                        StringUtils.isBlank(product.getCustomerIds()) ? null:
+                        Arrays.stream(product.getCustomerIds().split(","))
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList())
+                )
+        ));
     }
 
     @GetMapping("/page")

@@ -33,6 +33,12 @@ public class ErpPurchaseOrderRespVO {
     @ExcelProperty("供应商名称")
     private String supplierName;
 
+    @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
+    private Long warehouseId;
+    @Schema(description = "仓库名称", example = "芋道")
+    @ExcelProperty("仓库名称")
+    private String warehouseName;
+
     @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "311.89")
     @ExcelProperty("结算账户编号")
     private Long accountId;

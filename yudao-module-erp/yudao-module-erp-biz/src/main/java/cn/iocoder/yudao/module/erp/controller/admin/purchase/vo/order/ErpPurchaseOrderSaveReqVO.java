@@ -19,6 +19,9 @@ public class ErpPurchaseOrderSaveReqVO {
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
+    @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
+    private Long warehouseId;
+
     @Schema(description = "结算账户编号", example = "31189")
     private Long accountId;
 

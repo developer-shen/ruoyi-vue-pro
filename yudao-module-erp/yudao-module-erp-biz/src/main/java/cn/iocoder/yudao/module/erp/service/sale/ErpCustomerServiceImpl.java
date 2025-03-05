@@ -1,22 +1,27 @@
 package cn.iocoder.yudao.module.erp.service.sale;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.customer.ErpCustomerPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.customer.ErpCustomerSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpCustomerDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpCustomerMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOMER_NOT_ENABLE;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.WAREHOUSE_NOT_ENABLE;
 
 /**
  * ERP 客户 Service 实现类
@@ -77,6 +82,26 @@ public class ErpCustomerServiceImpl implements ErpCustomerService {
             throw exception(CUSTOMER_NOT_ENABLE, customer.getName());
         }
         return customer;
+    }
+
+    @Override
+    public List<ErpCustomerDO> validateCustomerList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<ErpCustomerDO> list = customerMapper.selectBatchIds(ids);
+
+        Map<Long, ErpCustomerDO> customerMap = convertMap(list, ErpCustomerDO::getId);
+        for (Long id : ids) {
+            ErpCustomerDO customerDO = customerMap.get(id);
+            if (customerMap.get(id) == null) {
+                throw exception(CUSTOMER_NOT_EXISTS);
+            }
+            if (CommonStatusEnum.isDisable(customerDO.getStatus())) {
+                throw exception(CUSTOMER_NOT_ENABLE, customerDO.getName());
+            }
+        }
+        return list;
     }
 
     @Override

@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Schema(description = "管理后台 - ERP 产品新增/修改 Request VO")
 @Data
@@ -55,4 +56,6 @@ public class ProductSaveReqVO {
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     private String fileUrl;
 
+    @Schema(description = "销售平台", example = "1,2,3")
+    private List<Long> customerIdList;
 }

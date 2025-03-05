@@ -51,12 +51,20 @@ public interface ErpCustomerService {
     ErpCustomerDO getCustomer(Long id);
 
     /**
-     * 校验客户
+     * 校验销售平台
      *
      * @param id 编号
      * @return 客户
      */
     ErpCustomerDO validateCustomer(Long id);
+
+    /**
+     * 校验销售平台列表
+     *
+     * @param ids 编号列表
+     * @return 客户列表
+     */
+    List<ErpCustomerDO> validateCustomerList(List<Long> ids);
 
     /**
      * 获得客户列表

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * ERP 产品 DO
@@ -88,5 +89,9 @@ public class ErpProductDO extends BaseDO {
      * 附件地址
      */
     private String fileUrl;
+    /**
+     * 销售平台
+     */
+    private String customerIds;
 
 }
