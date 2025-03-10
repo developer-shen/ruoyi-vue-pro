@@ -87,14 +87,20 @@ public class ErpProductController {
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
         ErpProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, ErpProductRespVO.class,
-                productVO -> productVO.setCustomerIdList(
-                        StringUtils.isBlank(product.getCustomerIds()) ? null:
-                        Arrays.stream(product.getCustomerIds().split(","))
+        // 客户id列表 string转list
+        List<Long> customerIdList = StringUtils.isBlank(product.getCustomerIds()) ? null:
+                Arrays.stream(product.getCustomerIds().split(","))
                         .map(Long::valueOf)
-                        .collect(Collectors.toList())
-                )
-        ));
+                        .collect(Collectors.toList());
+        List<Long> warehouseIdList = StringUtils.isBlank(product.getWarehouseIds())? null:
+                Arrays.stream(product.getWarehouseIds().split(","))
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList());
+
+        return success(BeanUtils.toBean(product, ErpProductRespVO.class, productVO -> {
+                    productVO.setCustomerIdList(customerIdList);
+                    productVO.setWarehouseIdList(warehouseIdList);
+                }));
     }
 
     @GetMapping("/page")

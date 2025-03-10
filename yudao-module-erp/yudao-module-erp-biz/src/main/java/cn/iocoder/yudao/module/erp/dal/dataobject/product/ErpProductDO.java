@@ -93,5 +93,8 @@ public class ErpProductDO extends BaseDO {
      * 销售平台
      */
     private String customerIds;
-
+    /**
+     * 存放仓库
+     */
+    private String warehouseIds;
 }

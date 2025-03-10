@@ -56,6 +56,9 @@ public class ProductSaveReqVO {
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     private String fileUrl;
 
-    @Schema(description = "销售平台", example = "1,2,3")
+    @Schema(description = "销售平台编号集", example = "[1,2,3]")
     private List<Long> customerIdList;
+
+    @Schema(description = "存放仓库编号集", example = "[1,2,3]")
+    private List<Long> warehouseIdList;
 }

@@ -92,5 +92,9 @@ public class ErpProductRespVO {
     @Schema(description = "销售平台编号", example = "[1,2,3]")
     private List<Long> customerIdList;
 
+    @Schema(description = "存放仓库编号", example = "1,2,3")
+    private String warehouseIds;
+    @Schema(description = "存放仓库编号", example = "[1,2,3]")
+    private List<Long> warehouseIdList;
 
 }

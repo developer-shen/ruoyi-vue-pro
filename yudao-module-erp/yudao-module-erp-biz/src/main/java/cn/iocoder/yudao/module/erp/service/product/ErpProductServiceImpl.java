@@ -16,10 +16,12 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductSkcDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.productprofit.ProductProfitDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpCustomerDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductSkcMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ProductProfitMapper;
 import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.report.controller.admin.report.vo.ReportSaveReqVO;
 import cn.iocoder.yudao.module.report.service.report.ReportService;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,8 @@ public class ErpProductServiceImpl implements ErpProductService {
     private ReportService reportService;
     @Resource
     private ErpCustomerService customerService;
+    @Resource
+    private ErpWarehouseService warehouseService;
 
     @Override
     @Transactional
@@ -98,18 +102,25 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     public void updateProduct(ProductSaveReqVO updateReqVO) {
-        // 校验存在
+        // 1校验存在
         validateProductExists(updateReqVO.getId());
-        // 校验销售平台
+        // 2.1 校验销售平台
         List<ErpCustomerDO> erpCustomerDOList = customerService.validateCustomerList(updateReqVO.getCustomerIdList());
         // 销售平台转字符串
         String customerIds = CollectionUtil.isNotEmpty(erpCustomerDOList)
                 ? erpCustomerDOList.stream().map(ErpCustomerDO::getId).map(String::valueOf).collect(Collectors.joining(","))
                 : "";
+        // 2.2 校验存放仓库
+        List<ErpWarehouseDO> erpWarehouseDOList = warehouseService.validWarehouseList(updateReqVO.getWarehouseIdList());
+        String warehouseIds = CollectionUtil.isNotEmpty(erpWarehouseDOList)
+                ? erpWarehouseDOList.stream().map(ErpWarehouseDO::getId).map(String::valueOf).collect(Collectors.joining(","))
+                : "";
 
         // 更新
-        ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class,
-                erpProductDO -> erpProductDO.setCustomerIds(customerIds));
+        ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class, erpProductDO -> {
+            erpProductDO.setCustomerIds(customerIds);
+            erpProductDO.setWarehouseIds(warehouseIds);
+        });
         productMapper.updateById(updateObj);
     }
 
@@ -204,14 +215,20 @@ public class ErpProductServiceImpl implements ErpProductService {
 //            MapUtils.findAndThen(unitMap, product.getUnitId(),
 //                    unit -> product.setUnitName(unit.getName()));
 //        });
-        // 销售平台处理
         List<ErpProductRespVO> result = BeanUtils.toBean(list, ErpProductRespVO.class, product -> {
+            // 销售平台处理
             if (StrUtil.isNotBlank(product.getCustomerIds())) {
                 List<Long> customerIdList = Arrays.stream(product.getCustomerIds().split(","))
                         .map(Long::valueOf)
                         .collect(Collectors.toList());
-
                 product.setCustomerIdList(customerIdList);
+            }
+            // 存放仓库处理
+            if (StrUtil.isNotBlank(product.getWarehouseIds())) {
+                List<Long> warehouseIdList = Arrays.stream(product.getWarehouseIds().split(","))
+                       .map(Long::valueOf)
+                       .collect(Collectors.toList());
+                product.setWarehouseIdList(warehouseIdList);
             }
         });
 
